@@ -16,15 +16,6 @@ class dragItems {
         }
     }
 
-    updateItems(dragables){
-        for (let i in dragables) {
-            if (dragables[i].className === "dragItem") {
-                dragIs.items[i].object = dragables[i]
-                dragables[i].id = "point_" + i;
-            }
-        }
-    }
-
     dragStart(index, e) {
         console.log("dragStart " + index);
         this.items[index].dragStart(e);
@@ -56,7 +47,7 @@ class dragItems {
             console.log("remove " + index);
             this.items[index].object.parentNode.removeChild(this.items[index].object);
             dragIs.items.splice(index, 1);
-            dragIs.refreshIDs();
+            dragIs.refresh();
         }
     }
 
@@ -66,16 +57,28 @@ class dragItems {
         }
     }
 
-    refreshIDs(){
+    refresh(){
+        console.log("Before refresh", this.items)
+        for (let i in this.items){
+            this.items[i].refreshObject();
+        }
+        console.log("After refreshObject", this.items)
         for (let i in this.items){
             this.items[i].object.id = "point_"+i;
+            this.items[i].refresID();
         }
+        console.log("After refresh", this.items)
+    }
+
+    length(){
+        return this.items.length;
     }
 }
 
 class dragItem {
     constructor(object) {
         this.object = object;
+        this.id = object.id;
         this.active = false;
         this.currentX = 0;
         this.currentY = 0;
@@ -126,6 +129,14 @@ class dragItem {
         }
     }
 
+    refresID(){
+        this.id = this.object.id;
+    }
+
+    refreshObject(){
+        this.object = document.getElementById(this.id);
+    }
+
     // remove(e) {
     //     // this.object.style.visibility = "hidden";
     //     // this.object.parentNode.style.display = "block";
@@ -172,12 +183,12 @@ document.oncontextmenu = function (e) {
 document.querySelectorAll(".button.plus")[0].onclick = function () {
     console.log("Plus clicked by tC")
 
-    document.getElementById("palatte").innerHTML += "<div class=\"dragItem\">\n</div>";
+    document.getElementById("palatte").innerHTML += "<div class=\"dragItem\" id=\"point_"+dragIs.length()+"\">\n</div>";
 
     dragables = document.querySelectorAll("#palatte > .dragItem");
     dragIs.newItem(dragables[dragables.length - 1]);
 
-    dragIs.updateItems(dragables);dragIs.refreshIDs();
+    dragIs.refresh();
 }
 
 document.querySelectorAll(".button.minus")[0].onclick = function () {
@@ -185,7 +196,7 @@ document.querySelectorAll(".button.minus")[0].onclick = function () {
     
     dragables = document.querySelectorAll("#palatte > .dragItem");
     if(dragIs.items.length){
-        dragIs.remove([dragIs.items.length - 1]);dragIs.refreshIDs();
+        dragIs.remove([dragIs.items.length - 1]); dragIs.refresh();
     }else{
         console.log("tT yit yees empty")
     }
