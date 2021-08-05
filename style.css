@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@300;400;700&family=Lato:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+html,
+body {
+    height: 100%;
+    padding: 0px;
+    overflow: hidden;
+    margin: 0;
+    background: #CFCFCF;
+}
+
+
+#outerContainer {
+    height: calc(100% - 40px);
+    /* height: 100%; */
+    overflow: hidden;
+    margin: 20px;
+    display: flex;
+    
+    box-shadow: -6px -6px 8px #F0F0F0, 6px 6px 8px rgba(121, 123, 129, 0.5), 
+    inset 4px 4px 15px rgba(14, 17, 16, 0.5), inset -4px -4px 15px rgba(94, 94, 94, 0.5);
+    border-radius: 20px;
+    background: #252525;
+}
+
+
+
+#palatte {
+    width: 100%;
+
+    /* display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+    align-content: stretch; */
+
+    overflow: hidden;
+    /* border-radius: 7px; */
+    touch-action: none;
+}
+
+.dragItem {
+    position: absolute;
+    top: calc(0% + 50px);
+    left: calc(0% + 50px);
+    width: 20px;
+    height: 20px;
+    background-color: rgb(245, 230, 99);
+    border: 3px solid #7D7D7D;
+    border-radius: 50%;
+    touch-action: none;
+    user-select: none;
+    transition: border-width 0.2s, margin 0.2s;
+}
+
+.dragItem:active {
+    background-color: rgba(168, 218, 220, 1.00);
+}
+
+.dragItem:hover {
+    cursor: pointer;
+    border-width: 8px;
+    margin: -5px;
+}
+
+
+
+
+#point-manager {
+    position: absolute;
+    top: calc(0% + 50px);
+    right: calc(0% + 50px);
+    /* width: 150px; */
+
+    display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-around;
+	align-items: center;
+	align-content: stretch;
+
+    overflow: hidden;
+    /* border-radius: 7px; */
+    touch-action: none;
+}
+
+#point-manager button{
+    margin:10px;
+    height: 40px;
+    width: 40px;
+
+    font-size: 20px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    color: rgb(211, 211, 211);
+    
+    display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+    text-align: center;
+
+    background: none;
+    border: 3px solid rgb(233, 233, 233);
+    border-radius: 6px;
+    padding: 0 10px 0 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#point-manager button:hover{
+    background-color: rgb(211, 211, 211);    
+    color: #252525;
+}
+
+#point-manager .plus:before{
+    content: '\FF0B';
+}
+
+#point-manager .minus::before{
+    content: '\2212';
+}
