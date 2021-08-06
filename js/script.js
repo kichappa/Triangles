@@ -98,6 +98,7 @@ class dragItem {
         }
         // console.log("dragStart initX, initY = [" + String([this.initialX, this.initialY]) + "]");
         this.active = true;
+        this.object.classList.add("active")
     }
 
     dragEnd(e) {
@@ -105,13 +106,16 @@ class dragItem {
         this.initialY = this.currentY;
         // console.log("dragEnd initX, initY = [" + String([this.initialX, this.initialY]) + "]");
         console.log("dragEnd [" + String([this.currentX, this.currentY]) + "]");
+        this.object.classList.remove("active")
         this.active = false;
     }
 
     drag(e) {
         // console.log("Trying to drag")
         if (this.active) {
-            // console.log("Pushing    ")
+            // console.log("Focussing", this.object);
+            // this.object.focus();
+            console.log("Pushing    ")
             e.preventDefault();
 
             if (e.type === "touchmove") {
@@ -149,26 +153,26 @@ class dragItem {
 }
 
 var dragIs = new dragItems();
-var dragables = document.querySelectorAll("#palatte > .dragItem");
+var dragables = document.querySelectorAll("#dragPalette > .dragItem");
 console.log(dragables);
 dragIs.newItems(dragables);
 console.log(dragIs.items)
 
-var palatte = document.querySelector("#palatte");
+var dragPalette = document.querySelector("#dragPalette");
 
 var clickedEl = null;
 
-palatte.addEventListener("touchstart", dragStart, false);
-palatte.addEventListener("touchend", dragEnd, false);
-palatte.addEventListener("touchmove", drag, false);
+dragPalette.addEventListener("touchstart", dragStart, false);
+dragPalette.addEventListener("touchend", dragEnd, false);
+dragPalette.addEventListener("touchmove", drag, false);
 
-palatte.addEventListener("mousedown", dragStart, false);
-palatte.addEventListener("mouseup", dragEnd, false);
-palatte.addEventListener("mousemove", drag, false);
+dragPalette.addEventListener("mousedown", dragStart, false);
+dragPalette.addEventListener("mouseup", dragEnd, false);
+dragPalette.addEventListener("mousemove", drag, false);
 
 document.oncontextmenu = function (e) {
     // console.log("Context menu on ", e.target);
-    // if (e.target === document.getElementById("palatte")) {
+    // if (e.target === document.getElementById("dragPalette")) {
     //     console.log("Hi tandu");
     //     for (let i in dragables) {
     //         try {
@@ -183,9 +187,9 @@ document.oncontextmenu = function (e) {
 document.querySelectorAll(".button.plus")[0].onclick = function () {
     console.log("Plus clicked by tC")
 
-    document.getElementById("palatte").innerHTML += "<div class=\"dragItem\" id=\"point_"+dragIs.length()+"\">\n</div>";
+    document.getElementById("dragPalette").innerHTML += "<div class=\"dragItem\" id=\"point_"+dragIs.length()+"\">\n</div>";
 
-    dragables = document.querySelectorAll("#palatte > .dragItem");
+    dragables = document.querySelectorAll("#dragPalette > .dragItem");
     dragIs.newItem(dragables[dragables.length - 1]);
 
     dragIs.refresh();
@@ -194,7 +198,7 @@ document.querySelectorAll(".button.plus")[0].onclick = function () {
 document.querySelectorAll(".button.minus")[0].onclick = function () {
     console.log("Minus clicked by tT")
     
-    dragables = document.querySelectorAll("#palatte > .dragItem");
+    dragables = document.querySelectorAll("#dragPalette > .dragItem");
     if(dragIs.items.length){
         dragIs.remove([dragIs.items.length - 1]); dragIs.refresh();
     }else{
@@ -236,7 +240,6 @@ function dragEnd(e) {
 function drag(e) {
     dragIs.drag(-1, e);
 }
-
 
 function setTranslate(xPos, yPos, el) {
     el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
