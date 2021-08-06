@@ -22,8 +22,8 @@ class dragItems {
     }
 
     dragEnd(index, e) {
-        console.log("dragEnd " + index);
         this.items[index].dragEnd(e);
+        console.log("dragEnd " + index);
     }
 
     drag(index, e) {
@@ -58,16 +58,16 @@ class dragItems {
     }
 
     refresh(){
-        console.log("Before refresh", this.items)
+        // console.log("Before refresh", this.items)
         for (let i in this.items){
             this.items[i].refreshObject();
         }
-        console.log("After refreshObject", this.items)
+        // console.log("After refreshObject", this.items)
         for (let i in this.items){
             this.items[i].object.id = "point_"+i;
             this.items[i].refresID();
         }
-        console.log("After refresh", this.items)
+        // console.log("After refresh", this.items)
     }
 
     length(){
@@ -96,15 +96,15 @@ class dragItem {
             this.initialX = e.clientX - this.xOffset;
             this.initialY = e.clientY - this.yOffset;
         }
-        console.log("initX, initY = [" + String([this.initialX, this.initialY]) + "]");
+        // console.log("dragStart initX, initY = [" + String([this.initialX, this.initialY]) + "]");
         this.active = true;
     }
 
     dragEnd(e) {
         this.initialX = this.currentX;
         this.initialY = this.currentY;
-        console.log("initX, initY = [" + String([this.initialX, this.initialY]) + "]");
-        console.log("currentX, currentY = [" + String([this.currentX, this.currentY]) + "]");
+        // console.log("dragEnd initX, initY = [" + String([this.initialX, this.initialY]) + "]");
+        console.log("dragEnd [" + String([this.currentX, this.currentY]) + "]");
         this.active = false;
     }
 
