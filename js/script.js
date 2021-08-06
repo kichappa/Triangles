@@ -244,3 +244,10 @@ function drag(e) {
 function setTranslate(xPos, yPos, el) {
     el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
 }
+
+colorjoe.rgb('picker', '#113c38', [
+    'currentColor',
+    ['fields', {space: 'RGB', limit: 255, fix: 0}],
+    ['fields', {space: 'HSL', limit: 100}],
+    'hex'
+]);
