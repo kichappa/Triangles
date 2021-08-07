@@ -28,6 +28,7 @@ export default function dragHandle(){
                 this.items[index].dragEnd(e);
                 console.log("dragEnd " + index);
             }
+            console.log("dragEnd");
         }
         drag(index, e) {
             if (index === -1) {
@@ -128,7 +129,7 @@ export default function dragHandle(){
             this.active = false;
         }
         drag(e) {
-            console.log("Trying to drag")
+            // console.log("Trying to drag")
             if (this.active) {
                 // console.log("Focussing", this.object);
                 // this.object.focus();
@@ -162,7 +163,7 @@ export default function dragHandle(){
             // let rect = this.object.getBoundingClientRect;
             // this.left = position[0];
             // this.top = position[1];
-            console.log("tiTu move "+position);
+            // console.log("tiTu move "+position);
             this.object.style.left = position[0]+'px';
             this.object.style.top = position[1]+'px';
         }
@@ -250,7 +251,7 @@ export default function dragHandle(){
                 }
             }
         } else {
-            console.log("dragStarting B")
+            // console.log("dragStarting B")
             // console.log("dragStart on ", e.target);
             for (let i in dragIs.items) {
                 // console.log(i, dragIs.items[i].object)
@@ -261,7 +262,7 @@ export default function dragHandle(){
                     target = e.target
                 }
                 if (target === dragIs.items[i].object) {
-                    console.log("Yes, "+i, dragIs.items[i].object)
+                    // console.log("Yes, "+i, dragIs.items[i].object)
                     dragIs.dragStart(i, e);
                 }
             }
@@ -270,8 +271,8 @@ export default function dragHandle(){
     }
     function dragEnd(e) {
         mousedown = false;
-        console.log("B mousedown is "+mousedown);
-        console.log(dragIs.items)
+        // console.log("B mousedown is "+mousedown);
+        // console.log(dragIs.items)
         // for (let i in dragIs.items) {
         //     if (e.target === dragIs.items[i].object) {
         //         dragIs.dragEnd(i, e);
@@ -281,7 +282,7 @@ export default function dragHandle(){
     }
     function drag(e) {
         if (dragIs.isAnyAcive()){
-            console.log("tiTu")
+            // console.log("tiTu")
             dragIs.drag(-1, e);
         }else if(mousedown){
             dragStart(e);
