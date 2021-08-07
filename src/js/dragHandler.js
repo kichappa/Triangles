@@ -106,7 +106,7 @@ export default function dragHandle(){
             // console.log("tiTu constructor dot size ["+ this.object.offsetWidth+", "+ this.object.offsetHeight +"]")
         }
         dragStart(e) {
-            if (e.type === "touchstart") {
+            if (e.type.substr(0,5) === "touch") {
                 this.pointerOffset[0] = e.touches[0].clientX - this.currentXY[0];
                 this.pointerOffset[1] = e.touches[0].clientY - this.currentXY[1];
             } else {
@@ -135,7 +135,7 @@ export default function dragHandle(){
                 // console.log("Pushing    ")
                 e.preventDefault();
 
-                if (e.type === "touchmove") {
+                if (e.type.substr(0,5) === "touch") {
                     this.currentXY[0] = e.touches[0].clientX - this.pointerOffset[0];
                     this.currentXY[1] = e.touches[0].clientY - this.pointerOffset[1];
                 } else {
@@ -234,7 +234,14 @@ export default function dragHandle(){
     }
     function dragStart(e) {
         mousedown = true;
+        // var myLocation = e.originalEvent.changedTouches[0];
+        // var realTarget = document.elementFromPoint(myLocation.clientX, myLocation.clientY);
+        // console.log("A mousedown is "+mousedown+" and target is", realTarget);
+        // console.log("event fello ["+ [e.touches[0].clientX, e.touches[0].clientY]+"]")
+        // console.log("target fello ", document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY))
+        // console.log(e.type.substr(0,5))
         if (e.button === 2) {
+            // console.log("dragStarting A")
             console.log("Right click on ", e.target);
             for (let i in dragIs.items) {
                 // console.log(i, dragIs.items[i].object)
@@ -243,11 +250,18 @@ export default function dragHandle(){
                 }
             }
         } else {
+            console.log("dragStarting B")
             // console.log("dragStart on ", e.target);
             for (let i in dragIs.items) {
                 // console.log(i, dragIs.items[i].object)
-                if (e.target === dragIs.items[i].object) {
-                    // console.log("Yes, "+i, dragIs.items[i].object)
+                var target;
+                if (e.type.substr(0,5) === "touch"){
+                    target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY)
+                }else{
+                    target = e.target
+                }
+                if (target === dragIs.items[i].object) {
+                    console.log("Yes, "+i, dragIs.items[i].object)
                     dragIs.dragStart(i, e);
                 }
             }
@@ -256,6 +270,7 @@ export default function dragHandle(){
     }
     function dragEnd(e) {
         mousedown = false;
+        console.log("B mousedown is "+mousedown);
         console.log(dragIs.items)
         // for (let i in dragIs.items) {
         //     if (e.target === dragIs.items[i].object) {
