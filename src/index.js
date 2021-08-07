@@ -1,7 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import './css/style.css';
+import './css/dragPalette.css';
+import './css/pointManager.css';
 import App from './App';
+import dragHandle from './js/dragHandler';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
@@ -15,3 +19,4 @@ ReactDOM.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+dragHandle();

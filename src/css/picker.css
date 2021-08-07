@@ -1,0 +1,90 @@
+#pickerContainer {    
+    background: rgba(255, 255, 255, 0.075);
+    border: 3px solid rgb(233, 233, 233);
+    border-radius: 6px;
+    /* padding: 20px; */
+    /* padding: 0 10px 0 10px; */
+    transition: background-color 0.3s, color 0.3s;
+
+    position: absolute;
+    top: calc(0% + 50px + 100px);
+    right: calc(0% + 50px);
+    /* width: 150px; */
+    
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    color: rgb(211, 211, 211);
+}
+
+#pickerContainer input{
+    background: none;
+    border: 2px solid rgb(233, 233, 233);
+    border-radius: 2px;
+    padding: 5px;
+    margin: 2px;
+
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: rgb(211, 211, 211);
+}
+
+#pickerContainer .color label{
+    background: none;
+    /* border: 1px solid rgb(233, 233, 233); */
+    padding: 5px;
+    margin: 2px;
+
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: rgb(211, 211, 211);
+}
+
+#point-manager button {
+    margin: 10px;
+    height: 40px;
+    width: 40px;
+
+    font-size: 20px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    color: rgb(211, 211, 211);
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    text-align: center;
+
+    background: none;
+    border: 3px solid rgb(233, 233, 233);
+    border-radius: 6px;
+    padding: 0 10px 0 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    #point-manager button:hover {
+        background-color: rgb(211, 211, 211);
+        color: #252525;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    #point-manager button:active {
+        background-color: rgb(211, 211, 211);
+        color: #252525;
+    }
+}
+
+#point-manager .plus:before {
+    content: '\FF0B';
+}
+
+#point-manager .minus::before {
+    content: '\2212';
+}
