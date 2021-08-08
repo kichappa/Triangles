@@ -19,7 +19,7 @@ const Point = ({className, point}) => {
         point.size = [point.ref.current.offsetWidth,point.ref.current.offsetHeight]
         point.ref.current.parentNode.style.left = point.currentXY[0]
         point.ref.current.parentNode.style.top= point.currentXY[1]
-        console.log(point.ref.current.parentNode.style.left, point.ref.current.parentNode.style.top)
+        // console.log(point.ref.current.parentNode.style.left, point.ref.current.parentNode.style.top)
     })
     point.ref = useRef(null)
     return (

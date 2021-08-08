@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect} from "react"
+import {useState} from "react"
 import Points from "./components/Points"
 
 function App() {
@@ -50,68 +50,65 @@ function App() {
         }
         if(target.className === "dragItem"){
             // console.log("Target is",target)
-            var index, dragItem
+            var index
             for(let i in dragIs){
                 if(dragIs[i].ref.current === target){
-                    console.log("now "+ i+1)
+                    console.log("now "+ i)
                     index = i
-                    dragItem = dragIs[i]
                 }
             }
-            // console.log(dragItem)     
-            console.log("dragStart "+index, dragItem)
+            // console.log(dragIs[index])     
+            console.log("dragStart "+index, dragIs[index])
             // setting pointerOffset values at the start of a drag 
             if (e.type.substr(0,5) === "touch") {
-                dragItem.pointerOffset[0] = e.touches[0].clientX - dragItem.currentXY[0]
-                dragItem.pointerOffset[1] = e.touches[0].clientY - dragItem.currentXY[1]
+                dragIs[index].pointerOffset[0] = e.touches[0].clientX - dragIs[index].currentXY[0]
+                dragIs[index].pointerOffset[1] = e.touches[0].clientY - dragIs[index].currentXY[1]
             } else {
-                dragItem.pointerOffset[0] = e.clientX - dragItem.currentXY[0]
-                dragItem.pointerOffset[1] = e.clientY - dragItem.currentXY[1]
+                dragIs[index].pointerOffset[0] = e.clientX - dragIs[index].currentXY[0]
+                dragIs[index].pointerOffset[1] = e.clientY - dragIs[index].currentXY[1]
             }
-            // console.log("dragStart ", dragItem.object.getBoundingClientRect().left, dragItem.object.getBoundingClientRect().top)
-            // console.log("dragStart initX, initY = [" + [dragItem.pointerOffset[0], dragItem.pointerOffset[1]] + "]")
-            dragItem.active = true
-            dragItem.ref.current.classList.add("active")
-            dragItem.ref.current.parentNode.style.zIndex = 1
-            // console.log("Now dragItem is", dragItem)
-            dragIs[index] = dragItem
-            setDragIs(dragIs)
+            // console.log("dragStart ", dragIs[index].object.getBoundingClientRect().left, dragIs[index].object.getBoundingClientRect().top)
+            // console.log("dragStart initX, initY = [" + [dragIs[index].pointerOffset[0], dragIs[index].pointerOffset[1]] + "]")
+            dragIs[index].active = true
+            dragIs[index].ref.current.classList.add("active")
+            dragIs[index].ref.current.parentNode.style.zIndex = 1
+            // console.log("Now dragIs[index] is", dragIs[index])
+            setDragIs([...dragIs])
         }
     }
     const drag = (e)=>{
         if(isAnyAcive()){
-            var dragItem
+            var index
             for(let i in dragIs){
-                dragItem = dragIs[i]
-                if(dragItem.active){
-                    console.log("Pushing...")
-                    e.preventDefault();
-
-                    // Calculating current XY 
-                    if (e.type.substr(0,5) === "touch") {
-                        dragItem.currentXY[0] = e.touches[0].clientX - dragItem.pointerOffset[0]
-                        dragItem.currentXY[1] = e.touches[0].clientY - dragItem.pointerOffset[1]
-                    } else {
-                        dragItem.currentXY[0] = e.clientX - dragItem.pointerOffset[0]
-                        dragItem.currentXY[1] = e.clientY - dragItem.pointerOffset[1]
-                    }
-                    let boundXY = [[dragItem.ref.current.parentNode.parentNode.getBoundingClientRect().left, 
-                                    dragItem.ref.current.parentNode.parentNode.getBoundingClientRect().top
-                                    ],
-                                    [0,0]]
-                    boundXY[1] = [boundXY[0][0]+dragItem.ref.current.parentNode.parentNode.clientWidth-dragItem.size[0], 
-                                    boundXY[0][1]+dragItem.ref.current.parentNode.parentNode.clientHeight-dragItem.size[1]]
-                    // console.log("boundXY is", boundXY);
-                    dragItem.currentXY[0] = Math.max(Math.min(dragItem.currentXY[0], boundXY[1][0]), boundXY[0][0])
-                    dragItem.currentXY[1] = Math.max(Math.min(dragItem.currentXY[1], boundXY[1][1]), boundXY[0][1])
-                    dragItem.ref.current.parentNode.style.left = dragItem.currentXY[0]
-                    dragItem.ref.current.parentNode.style.top = dragItem.currentXY[1]
-                    // console.log("dragItem is", dragItem)
-                    
-                    dragIs[i] = dragItem
-                    setDragIs(dragIs)
+                if(dragIs[i].active){
+                    index = i
                 }
             }
+            // console.log("Pushing...")
+            e.preventDefault();
+
+            // Calculating current XY 
+            if (e.type.substr(0,5) === "touch") {
+                dragIs[index].currentXY[0] = e.touches[0].clientX - dragIs[index].pointerOffset[0]
+                dragIs[index].currentXY[1] = e.touches[0].clientY - dragIs[index].pointerOffset[1]
+            } else {
+                dragIs[index].currentXY[0] = e.clientX - dragIs[index].pointerOffset[0]
+                dragIs[index].currentXY[1] = e.clientY - dragIs[index].pointerOffset[1]
+            }
+            let boundXY = [[dragIs[index].ref.current.parentNode.parentNode.getBoundingClientRect().left, 
+                            dragIs[index].ref.current.parentNode.parentNode.getBoundingClientRect().top
+                            ],
+                            [0,0]]
+            boundXY[1] = [boundXY[0][0]+dragIs[index].ref.current.parentNode.parentNode.clientWidth-dragIs[index].size[0], 
+                            boundXY[0][1]+dragIs[index].ref.current.parentNode.parentNode.clientHeight-dragIs[index].size[1]]
+            // console.log("boundXY is", boundXY);
+            dragIs[index].currentXY[0] = Math.max(Math.min(dragIs[index].currentXY[0], boundXY[1][0]), boundXY[0][0])
+            dragIs[index].currentXY[1] = Math.max(Math.min(dragIs[index].currentXY[1], boundXY[1][1]), boundXY[0][1])
+            dragIs[index].ref.current.parentNode.style.left = dragIs[index].currentXY[0]
+            dragIs[index].ref.current.parentNode.style.top = dragIs[index].currentXY[1]
+            // console.log("dragIs[index] is", dragIs[index])
+            
+            setDragIs([...dragIs])
 
         }else if(mouseDown){
             dragStart(e)
@@ -119,20 +116,19 @@ function App() {
     }
     const dragEnd = (e)=>{
         mouseDown=false
-        var dragItem
-        for(let i in dragIs){
-            dragItem = dragIs[i]
-            if(dragItem.active){
-                dragItem.pointerOffset[0] = dragItem.currentXY[0];
-                dragItem.pointerOffset[1] = dragItem.currentXY[1];
-                dragItem.ref.current.classList.remove("active")
-                dragItem.active = false;
-                dragItem.ref.current.parentNode.style.zIndex = 0;
-                
-                dragIs[i] = dragItem
-                console.log("dragEnd "+i, dragItem)
-                setDragIs(dragIs)
-            }
+        var index
+        for(let i in dragIs) 
+            if(dragIs[i].active)
+                index = i
+        if(index){
+            dragIs[index].pointerOffset[0] = dragIs[index].currentXY[0];
+            dragIs[index].pointerOffset[1] = dragIs[index].currentXY[1];
+            dragIs[index].ref.current.classList.remove("active")
+            dragIs[index].active = false;
+            dragIs[index].ref.current.parentNode.style.zIndex = 0;
+            
+            console.log("dragEnd "+index, dragIs[index])
+            setDragIs([...dragIs])
         }
     }
     const isAnyAcive=()=>{
