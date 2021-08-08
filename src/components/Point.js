@@ -1,5 +1,6 @@
 import React from 'react'
 import reactCSS from 'reactcss'
+import {useRef, useEffect} from 'react'
 
 const Point = ({className, point}) => {
     const styles = reactCSS({
@@ -14,9 +15,16 @@ const Point = ({className, point}) => {
             }
         },
     })
+    useEffect(()=>{
+        point.size = [point.ref.current.offsetWidth,point.ref.current.offsetHeight]
+        point.ref.current.parentNode.style.left = point.currentXY[0]
+        point.ref.current.parentNode.style.top= point.currentXY[1]
+        console.log(point.ref.current.parentNode.style.left, point.ref.current.parentNode.style.top)
+    })
+    point.ref = useRef(null)
     return (
         <div style={styles.container}>
-            <div style={styles.point} className="dragItem" id={point.id}/>
+            <div ref={point.ref} style={styles.point} className="dragItem" id={point.id}/>
         </div>
     )
 }
