@@ -80,6 +80,9 @@ export default function dragHandle(){
             }
             return active;
         }
+        setColour(index, colour){
+            this.items[index].setColour(colour);
+        }
     }
     class dragItem {
         // While not being dragged, [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0), (used in transform: translate3D(X, Y, 0))
@@ -89,14 +92,16 @@ export default function dragHandle(){
         // After a drag event, all [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0); again. 
         constructor(object) {
             this.object = object;
+            this.container = this.object.parentNode;
             this.id = object.id;
             this.active = false;
-            this.color = "#000000";
+            this.colour = "#f5e663";
+            this.paint();
             this.pointerOffset = [0, 0];
             // this.currentXY = [0, 0];
             this.move([50,50]);
             // this.move([0,0]);
-            this.currentXY = [this.object.getBoundingClientRect().left, this.object.getBoundingClientRect().top];
+            this.currentXY = [this.container.getBoundingClientRect().left, this.container.getBoundingClientRect().top];
             // let boundXY = [[this.object.parentNode.getBoundingClientRect().left, this.object.parentNode.getBoundingClientRect().top],[0,0]];
             // boundXY[1] = [boundXY[0][0] + this.object.parentNode.clientWidth, boundXY[0][1] + this.object.parentNode.clientHeight];
             // console.log("bound", boundXY);
@@ -115,9 +120,10 @@ export default function dragHandle(){
                 this.pointerOffset[1] = e.clientY - this.currentXY[1];
             }
             // console.log("tiTu dragStart ", this.object.getBoundingClientRect().left, this.object.getBoundingClientRect().top);
-            // console.log("dragStart initX, initY = [" + String([this.pointerOffset[0], this.pointerOffset[1]]) + "]");
+            console.log("dragStart initX, initY = [" + [this.pointerOffset[0], this.pointerOffset[1]] + "]");
             this.active = true;
             this.object.classList.add("active")
+            this.container.style.zIndex = 1;
         }
         dragEnd(e) {
             this.pointerOffset[0] = this.currentXY[0];
@@ -127,13 +133,15 @@ export default function dragHandle(){
             // console.log("dragEnd [" + String([this.currentXY[0], this.currentXY[1]]) + "]");
             this.object.classList.remove("active")
             this.active = false;
+            // this.object.style.removeProperty("zIndex");
+            this.container.style.zIndex = 0;
         }
         drag(e) {
             // console.log("Trying to drag")
             if (this.active) {
                 // console.log("Focussing", this.object);
                 // this.object.focus();
-                // console.log("Pushing    ")
+                console.log("Pushing    ")
                 e.preventDefault();
 
                 if (e.type.substr(0,5) === "touch") {
@@ -143,8 +151,8 @@ export default function dragHandle(){
                     this.currentXY[0] = e.clientX - this.pointerOffset[0];
                     this.currentXY[1] = e.clientY - this.pointerOffset[1];
                 }
-                let boundXY = [[this.object.parentNode.getBoundingClientRect().left, this.object.parentNode.getBoundingClientRect().top],[0,0]];
-                boundXY[1] = [boundXY[0][0]+this.object.parentNode.clientWidth-this.size[0], boundXY[0][1]+this.object.parentNode.clientHeight-this.size[1]];
+                let boundXY = [[this.container.parentNode.getBoundingClientRect().left, this.container.parentNode.getBoundingClientRect().top],[0,0]];
+                boundXY[1] = [boundXY[0][0]+this.container.parentNode.clientWidth-this.size[0], boundXY[0][1]+this.container.parentNode.clientHeight-this.size[1]];
                 // console.log(boundXY);
                 this.currentXY[0] = Math.max(Math.min(this.currentXY[0], boundXY[1][0]), boundXY[0][0]);
                 this.currentXY[1] = Math.max(Math.min(this.currentXY[1], boundXY[1][1]), boundXY[0][1]);
@@ -163,14 +171,22 @@ export default function dragHandle(){
             // let rect = this.object.getBoundingClientRect;
             // this.left = position[0];
             // this.top = position[1];
-            // console.log("tiTu move "+position);
-            this.object.style.left = position[0]+'px';
-            this.object.style.top = position[1]+'px';
+            console.log("tiTu move "+position);
+            this.container.style.left = position[0]+'px';
+            this.container.style.top = position[1]+'px';
         }
         isActive(){
             return this.active;
         }
-        // remove(e) {
+        setColour(colour){
+            this.colour = colour;
+            this.paint();
+        }
+        paint(){
+            // this.object.style.backgroundColor = "#FFF";
+            this.object.style.backgroundColor = this.colour;
+        }
+        remove(e) {
         //     // this.object.style.visibility = "hidden";
         //     // this.object.parentNode.style.display = "block";
         //     // var contextMenuObj = document.getElementById("ctxMenu");
@@ -178,11 +194,11 @@ export default function dragHandle(){
         //     // contextMenuObj.close();
         //     // this.object.parentNode.removeChild(this.object);
         //     // dragIs.items.splice(index, 1);
-        // }
+        }
     }
     var dragIs = new dragItems();
-    var dragables = document.querySelectorAll("#dragPalette > .dragItem");
-    console.log(dragables);
+    var dragables = document.querySelectorAll(".dragItem");
+    console.log("Dragables are", dragables);
     dragIs.newItems(dragables);
     console.log(dragIs.items)
     var mousedown = false;
@@ -213,28 +229,29 @@ export default function dragHandle(){
         // }
         return false;
     }
-    document.querySelectorAll(".button.plus")[0].onclick = function () {
-        console.log("Plus clicked by tC")
+    // document.querySelectorAll(".button.plus")[0].onclick = function () {
+    //     console.log("Plus clicked by tC")
 
-        document.getElementById("dragPalette").innerHTML += "<div class=\"dragItem\" id=\"point_"+dragIs.length()+"\">\n</div>";
+    //     document.getElementById("dragPalette").innerHTML += "<div class=\"dragItem\" id=\"point_"+dragIs.length()+"\">\n</div>";
 
-        dragables = document.querySelectorAll("#dragPalette > .dragItem");
-        dragIs.newItem(dragables[dragables.length - 1]);
+    //     dragables = document.querySelectorAll("#dragPalette > .dragItem");
+    //     dragIs.newItem(dragables[dragables.length - 1]);
 
-        dragIs.refresh();
-    }
-    document.querySelectorAll(".button.minus")[0].onclick = function () {
-        console.log("Minus clicked by tT")
+    //     dragIs.refresh();
+    // }
+    // document.querySelectorAll(".button.minus")[0].onclick = function () {
+    //     console.log("Minus clicked by tT")
         
-        dragables = document.querySelectorAll("#dragPalette > .dragItem");
-        if(dragIs.items.length){
-            dragIs.remove([dragIs.items.length - 1]); dragIs.refresh();
-        }else{
-            console.log("tT yit yees empty")
-        }
-    }
+    //     dragables = document.querySelectorAll("#dragPalette > .dragItem");
+    //     if(dragIs.items.length){
+    //         dragIs.remove([dragIs.items.length - 1]); dragIs.refresh();
+    //     }else{
+    //         console.log("tT yit yees empty")
+    //     }
+    // }
     function dragStart(e) {
         mousedown = true;
+        // console.log("Starting drag")
         // var myLocation = e.originalEvent.changedTouches[0];
         // var realTarget = document.elementFromPoint(myLocation.clientX, myLocation.clientY);
         // console.log("A mousedown is "+mousedown+" and target is", realTarget);
@@ -252,7 +269,7 @@ export default function dragHandle(){
             }
         } else {
             // console.log("dragStarting B")
-            // console.log("dragStart on ", e.target);
+            console.log("dragStart on ", e.target);
             for (let i in dragIs.items) {
                 // console.log(i, dragIs.items[i].object)
                 var target;
@@ -288,9 +305,11 @@ export default function dragHandle(){
             dragStart(e);
         }
     }
-    function setTranslate(xPos, yPos, el) {
-        el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
-    }
+    
+    return dragIs;
+    // function setTranslate(xPos, yPos, el) {
+    //     el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+    // }
 }
 
 // colorjoe.rgb('picker', '#113c38', [

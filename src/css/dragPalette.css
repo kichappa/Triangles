@@ -20,7 +20,7 @@
     left: calc(0% + 50px); */
     width: 20px;
     height: 20px;
-    background-color: rgb(245, 230, 99);
+    /* background-color: #f5e663; */
     border: 3px solid #7D7D7D;
     border-radius: 50%;
     touch-action: none;
