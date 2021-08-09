@@ -46,11 +46,14 @@
     border-radius: 6px;
     padding: 0 10px 0 10px;
     /* transition: background-color 0.3s, color 0.3s; */
-    transition: box-shadow 0.3s;
+    transition: box-shadow 0.1s;
 }
 
 @media (hover: hover) and (pointer: fine) {
     #point-manager button:hover {
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6), -2px -2px 8px rgba(133, 129, 129, 0.5), inset -1px -1px 4px rgba(19, 20, 20, 0.5), inset 1px 1px 4px rgba(106, 107, 109, 0.5);
+    }
+    #point-manager button:active {
         /* background-color: rgb(211, 211, 211);
         color: #252525; */
         box-shadow: 2px 2px 8px rgba(11, 11, 11, 0.6), -2px -2px 8px rgba(101, 101, 101, 0.5), inset 6px 6px 10px rgba(28, 29, 29, 0.5), inset -5px -5px 10px rgba(45, 45, 47, 0.5);

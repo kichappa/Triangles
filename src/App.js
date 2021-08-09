@@ -56,15 +56,15 @@ function App() {
         mouseBound.mouseDown = true;
         setMouseBound(mouseBound)
         // capturing target since touch and mouse output different e.target
-        var target
-        if (e.pointerType === "touch"){
-                target = document.elementFromPoint(e.clientX, e.clientY)
-        }else{
-                target = e.target
-        }
-        if(!target.id==="dragPalette"){
-            console.log(target)
-        }
+        var target = document.elementFromPoint(e.clientX, e.clientY)
+        // if (e.pointerType === "touch"){
+        //         target = document.elementFromPoint(e.clientX, e.clientY)
+        // }else{
+        //         target = e.target
+        // }
+        // if(!target.id==="dragPalette"){
+        //     console.log(target)
+        // }
         if(target.classList.contains("dragItem")){
             // console.log("Target is",target)
             var index
@@ -181,8 +181,10 @@ function App() {
         for(let i in dragIs){
             dragIs[i].showPicker=false
             dragIs[i].ref.current.classList.remove("active")
+            dragIs[i].ref.current.parentNode.style.zIndex = 0;
         }
         dragIs[index].ref.current.classList.add("active")
+        dragIs[index].ref.current.parentNode.style.zIndex = 1;
         setDragIs(dragIs)
     }
     const isAnyAcive=()=>{
