@@ -1,17 +1,23 @@
 import React from 'react'
 import Point from "./Point"
+import { useEffect } from 'react'
 
-const Points = ({points, onChangeColor}) => {
+const Points = ({points, onChangeColor, onRender}) => {
     // console.log("Points are ", points)
     // const changeColor = (index, color)=>{
     //     console.log("Changing color of point "+index+" to ",color)
     // }
 
+    useEffect(() => {
+        onRender()
+    })
+
     var Points = []
     for(let i in points){
         Points.push(<Point 
-                        point={points[i]} 
-                        // onChangeColor={(color)=>changeColor(i, color)}
+                        points={points}
+                        index={i} 
+                        onChangeColor={onChangeColor}
                         // onClick={onClick}
                     />
                     )

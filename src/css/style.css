@@ -13,10 +13,13 @@ body, .App, #root{
 
 #outerContainer {
     height: calc(100vh - 40px);
+    /* width: calc(100vh - 40px); */
     /* height: 100%; */
     overflow: hidden;
     margin: 20px;
-    display: flex;
+    position: relative;
+    /* position: absolute; */
+    /* display: flex; */
     
     box-shadow: -6px -6px 8px #F0F0F0, 6px 6px 8px rgba(121, 123, 129, 0.5), 
     inset 4px 4px 15px rgba(14, 17, 16, 0.5), inset -4px -4px 15px rgba(94, 94, 94, 0.5);

@@ -3,51 +3,64 @@ import reactCSS from 'reactcss'
 import {useRef, useEffect, useState} from 'react'
 import { SketchPicker } from 'react-color';
 
-const Point = ({className, point, onChangeColor}) => {
-    const [color, setColor] =  useState(
-        point.colour
-    )
+const Point = ({className, points, onChangeColor, index}) => {
+    // console.log(points, points[index])    
+    // const [color, setColor] =  useState({
+    //     color: points[index].colour.hex, 
+    //     fullColor: points[index].colour
+    // })
     // console.log(color[0])
     const styles = reactCSS({
         'default':{
             container: {
                 position: 'absolute',
-                left: point.currentXY.x,
-                top: point.currentXY.y,
-              },
+                left: points[index].currentXY.x,
+                top: points[index].currentXY.y,
+            },
             point: {
-                backgroundColor: color,
+                // backgroundColor: color.color,
+                backgroundColor: points[index].colour.hex,
+            },
+            picker:{
+                position: 'fixed'
             }
         },
     })
+    // points[index].size = [points[index].ref.current.offsetWidth,points[index].ref.current.offsetHeight]
     useEffect(()=>{
-        point.size = [point.ref.current.offsetWidth,point.ref.current.offsetHeight]
-        // setColor(point.color)
-        // point.ref.current.parentNode.style.left = point.currentXY.x
-        // point.ref.current.parentNode.style.top= point.currentXY.y
-        // console.log(point.ref.current.parentNode.style.left, point.ref.current.parentNode.style.top)
+        // setColor(points[index].color)
+        // points[index].ref.current.parentNode.style.left = points[index].currentXY.x
+        // points[index].ref.current.parentNode.style.top= points[index].currentXY.y
+        // console.log(points[index].ref.current.parentNode.style.left, points[index].ref.current.parentNode.style.top)
     })
-    const ChangeColor=(color)=>{
+    const changeColor=(color)=>{
         // console.log("tT changing color to", color, color.hex)
         // onChangeColor(color)
-        point.colour = color.hex
-        setColor(color.hex)
+        // points[index].colour = color
+        // onChangeColor(index, color)
+        // setColor({color: color.hex, fullColor: color})
+        // onChangeColor(index, color)
     }
-    point.ref = useRef(null)
+    points[index].ref = useRef(null)
     
     return (
         <div style={styles.container}>
             <div 
-                ref={point.ref} 
+                ref={points[index].ref} 
                 style={styles.point} 
                 className="dragItem" 
-                id={point.id}
-                // onClick={onClick(point)}
+                id={points[index].id}
+                // onClick={onClick(points[index])}
             />
-            {point.showPicker && 
+            {points[index].showPicker && 
             <SketchPicker
-                color={color}
-                onChange={ChangeColor}
+                style={{
+                    position: 'fixed'
+                }}
+                // color={color.color}
+                color={points[index].colour.hex}
+                // onChange={changeColor}
+                onChange={(color)=>onChangeColor(index, color)}
                 disableAlpha={true}
                 presetColors={[]}
             />}

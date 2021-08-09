@@ -1,7 +1,8 @@
 #point-manager {
+    z-index: 0;
     position: absolute;
-    top: calc(0% + 50px);
-    right: calc(0% + 50px);
+    top: calc(0% + 20px);
+    right: calc(0% + 20px);
     /* width: 150px; */
 
     display: flex;

@@ -1,5 +1,6 @@
-import {useState} from "react"
+import {useState, useEffect} from "react"
 import Points from "./components/Points"
+import Canvas from "./components/Canvas";
 
 function App() {
     const [mouseBound, setMouseBound]=useState([
@@ -14,6 +15,9 @@ function App() {
             }
         }
     ]);
+    var defaultColour = {
+        "hsl":{"h":53.835616438356155,"s":0.8795180722891567,"l":0.6745098039215687,"a":1},"hex":"#f5e663","rgb":{"r":245,"g":230,"b":99,"a":1},"hsv":{"h":53.835616438356155,"s":0.5959183673469387,"v":0.9607843137254902,"a":1},"oldHue":53.33333333333332,"source":"hex"
+    }
     const [dragIs, setDragIs] = useState([
         {   // While not being dragged, [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0), (used in transform: translate3D(X, Y, 0))
             // While being dragged, 
@@ -22,22 +26,42 @@ function App() {
             // After a drag event, all [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0); again. 
             ref: null,
             active: false,
-            colour: "#f5e663",
+            colour: defaultColour,
             showPicker: false,
             pointerOffset: {x:0, y:0},
             currentXY: {x:50, y:50},
-            size: [0,0]
+            size: false
         }
-    ])
+    ])  
+    const getCanvasPoints=(set)=>{
+        let points = new Array(dragIs.length)
+        // console.log("setting Canvas points")
+        for(let i in dragIs){
+            if(dragIs[i].size){
+                // console.log(dragIs[i].currentXY, dragIs[i].size)
+                // console.log(dragIs[i].colour)
+                points[i] = {
+                    x: dragIs[i].currentXY.x+dragIs[i].size[0]/2,
+                    y: dragIs[i].currentXY.y+dragIs[i].size[1]/2,
+                    colour: dragIs[i].colour.hsv
+                }
+            }
+        }
+        // console.log("newCanvasPoints are ", points)
+        if (set) setCanvasPoints(points)
+        return points
+    }
+    const [canvasPoints, setCanvasPoints] = useState(false)
+    
     const addDragItem = ()=>{
         const newDragItem={
             ref: null,
             active: false,
-            colour: "#f5e663",
+            colour: defaultColour,
             showPicker: false,
             pointerOffset: {x:0, y:0},
             currentXY: {x:50, y:50},
-            size: [0,0]
+            size: false
         }
         setDragIs([...dragIs, newDragItem])
     }
@@ -70,10 +94,11 @@ function App() {
             var index
             for(let i in dragIs){
                 if(dragIs[i].ref.current === target){
-                    console.log("now "+ i)
+                    // console.log("now "+ i)
                     index = i
                 }
             }
+
             // console.log(dragIs[index])     
             console.log("dragStart "+index, dragIs[index])
             // setting pointerOffset values at the start of a drag 
@@ -121,24 +146,27 @@ function App() {
             if(!isClick(mouseBound.start, mouseBound.end)){
                 onPicker(dragIs[index], false)
                 closePickers(index)
+            
+                dragIs[index].currentXY.x = clientXY.x - dragIs[index].pointerOffset.x
+                dragIs[index].currentXY.y = clientXY.y - dragIs[index].pointerOffset.y
+                
+                // let boundXY = [[dragIs[index].ref.current.parentNode.parentNode.getBoundingClientRect().left, 
+                //                 dragIs[index].ref.current.parentNode.parentNode.getBoundingClientRect().top
+                //                 ],
+                //                 [0,0]
+                //             ]
+                let boundXY = [[0,0],[0,0]]
+                boundXY[1] = [boundXY[0][0]+dragIs[index].ref.current.parentNode.parentNode.clientWidth-dragIs[index].size[0], 
+                                boundXY[0][1]+dragIs[index].ref.current.parentNode.parentNode.clientHeight-dragIs[index].size[1]]
+                // console.log("boundXY is", boundXY);
+                dragIs[index].currentXY.x = Math.max(Math.min(dragIs[index].currentXY.x, boundXY[1][0]), boundXY[0][0])
+                dragIs[index].currentXY.y = Math.max(Math.min(dragIs[index].currentXY.y, boundXY[1][1]), boundXY[0][1])
+                dragIs[index].ref.current.parentNode.style.left = dragIs[index].currentXY.x
+                dragIs[index].ref.current.parentNode.style.top = dragIs[index].currentXY.y
+                // console.log("dragIs[index] is", dragIs[index])
+                
+                setDragIs([...dragIs])
             }
-            dragIs[index].currentXY.x = clientXY.x - dragIs[index].pointerOffset.x
-            dragIs[index].currentXY.y = clientXY.y - dragIs[index].pointerOffset.y
-            
-            let boundXY = [[dragIs[index].ref.current.parentNode.parentNode.getBoundingClientRect().left, 
-                            dragIs[index].ref.current.parentNode.parentNode.getBoundingClientRect().top
-                            ],
-                            [0,0]]
-            boundXY[1] = [boundXY[0][0]+dragIs[index].ref.current.parentNode.parentNode.clientWidth-dragIs[index].size[0], 
-                            boundXY[0][1]+dragIs[index].ref.current.parentNode.parentNode.clientHeight-dragIs[index].size[1]]
-            // console.log("boundXY is", boundXY);
-            dragIs[index].currentXY.x = Math.max(Math.min(dragIs[index].currentXY.x, boundXY[1][0]), boundXY[0][0])
-            dragIs[index].currentXY.y = Math.max(Math.min(dragIs[index].currentXY.y, boundXY[1][1]), boundXY[0][1])
-            dragIs[index].ref.current.parentNode.style.left = dragIs[index].currentXY.x
-            dragIs[index].ref.current.parentNode.style.top = dragIs[index].currentXY.y
-            // console.log("dragIs[index] is", dragIs[index])
-            
-            setDragIs([...dragIs])
 
         }else if(mouseBound.mouseDown){
             // console.log("None active")
@@ -165,12 +193,12 @@ function App() {
             if(isClick(mouseBound.start, mouseBound.end) && !dragIs[index].showPicker){
                 closePickers(index)
                 dragIs[index].ref.current.classList.add("active")
-                dragIs[index].ref.current.parentNode.style.zIndex = 1;
+                dragIs[index].ref.current.parentNode.style.zIndex = 2;
                 onPicker(dragIs[index], true)
             }
             else{
                 onPicker(dragIs[index], false)
-                dragIs[index].ref.current.parentNode.style.zIndex = 0;
+                dragIs[index].ref.current.parentNode.style.zIndex = 1;
             }
 
             console.log("dragEnd "+index, dragIs[index])
@@ -181,10 +209,10 @@ function App() {
         for(let i in dragIs){
             dragIs[i].showPicker=false
             dragIs[i].ref.current.classList.remove("active")
-            dragIs[i].ref.current.parentNode.style.zIndex = 0;
+            dragIs[i].ref.current.parentNode.style.zIndex = 1;
         }
         dragIs[index].ref.current.classList.add("active")
-        dragIs[index].ref.current.parentNode.style.zIndex = 1;
+        dragIs[index].ref.current.parentNode.style.zIndex = 2;
         setDragIs(dragIs)
     }
     const isAnyAcive=()=>{
@@ -208,10 +236,32 @@ function App() {
             point.showPicker = state
     }
     const isClick=(startXY, endXY)=>{
-        let tol=10
+        let tol=5
         let value = Math.sqrt(Math.pow(endXY.x-startXY.x,2) + Math.pow(endXY.y-startXY.y,2))
         return (value<=tol)
     }
+    const initSizes=()=>{
+        let update = false
+        for (let i in dragIs){
+            // console.log(!dragIs[i].size)
+            if(!dragIs[i].size){
+                // console.log("setting size for "+i )
+                update = true
+                dragIs[i].size = [dragIs[i].ref.current.offsetWidth, dragIs[i].ref.current.offsetHeight]
+            }
+        } 
+        if(update) setDragIs(dragIs)
+    } 
+    const onChangeColor=(index, color)=>{
+        // console.log("changing color of "+ index, color)
+        let newDragIs = [...dragIs]
+        newDragIs[index].colour = color
+        setDragIs([...newDragIs])
+    }
+    useEffect(() => {
+        // console.log("dragIs were updated, updating points")
+        getCanvasPoints(true)
+    }, [dragIs])
     return (
         <div className="App" 
             // onTouchStart={(e)=>dragStart(e)} 
@@ -227,8 +277,8 @@ function App() {
         >
             <div id="outerContainer">
                 <div id="dragPalette">
-                    {/* <Points points={dragIs} onClick={onPicker}/> */}
-                    <Points points={dragIs}/>
+                    <Canvas id={"gradientPalette"} canvasPoints={canvasPoints}/>
+                    <Points points={dragIs} onRender={initSizes} onChangeColor={onChangeColor}/>
                 </div>
                 <div id="point-manager">
                         <button className="button plus" onClick={addDragItem}></button>
