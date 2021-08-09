@@ -15,7 +15,7 @@
 
 .dragItem {
     touch-action: none;
-    position: absolute;
+    /* position: absolute; */
     /* top: calc(0% + 50px);
     left: calc(0% + 50px); */
     width: 20px;
