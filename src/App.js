@@ -57,10 +57,13 @@ function App() {
         setMouseBound(mouseBound)
         // capturing target since touch and mouse output different e.target
         var target
-        if (e.type.substr(0,5) === "touch"){
-                target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY)
+        if (e.pointerType === "touch"){
+                target = document.elementFromPoint(e.clientX, e.clientY)
         }else{
                 target = e.target
+        }
+        if(!target.id==="dragPalette"){
+            console.log(target)
         }
         if(target.classList.contains("dragItem")){
             // console.log("Target is",target)
@@ -137,6 +140,8 @@ function App() {
             setDragIs([...dragIs])
 
         }else if(mouseBound.mouseDown){
+            // console.log("None active")
+            console.log(e)
             dragStart(e)
         }
     }
