@@ -86,7 +86,7 @@ function App() {
             mouseBound.start = clientXY
             mouseBound.end = clientXY
             setMouseBound(mouseBound)
-            console.log("Setting mouseStart", mouseBound.start)
+            // console.log("Setting mouseBound", mouseBound)
             dragIs[index].pointerOffset.x = clientXY.x - dragIs[index].currentXY.x
             dragIs[index].pointerOffset.y = clientXY.y - dragIs[index].currentXY.y
             // console.log("dragStart ", dragIs[index].object.getBoundingClientRect().left, dragIs[index].object.getBoundingClientRect().top)
@@ -141,7 +141,7 @@ function App() {
 
         }else if(mouseBound.mouseDown){
             // console.log("None active")
-            console.log(e)
+            // console.log(e)
             dragStart(e)
         }
     }
@@ -160,7 +160,7 @@ function App() {
             
             // console.log("mouseStart", mouseBound.start)
             // console.log("mouseEnd", mouseBound.end)
-            console.log(e, dragIs[index].showPicker)
+            // console.log(e, dragIs[index].showPicker)
             if(isClick(mouseBound.start, mouseBound.end) && !dragIs[index].showPicker){
                 dragIs[index].ref.current.classList.add("active")
                 dragIs[index].ref.current.parentNode.style.zIndex = 1;

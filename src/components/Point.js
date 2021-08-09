@@ -7,7 +7,7 @@ const Point = ({className, point, onChangeColor}) => {
     const [color, setColor] =  useState(
         point.colour
     )
-    console.log(color[0])
+    // console.log(color[0])
     const styles = reactCSS({
         'default':{
             container: {
@@ -29,7 +29,7 @@ const Point = ({className, point, onChangeColor}) => {
     })
     const ChangeColor=(color)=>{
         // console.log("tT changing color to", color, color.hex)
-        onChangeColor(color)
+        // onChangeColor(color)
         point.colour = color.hex
         setColor(color.hex)
     }
