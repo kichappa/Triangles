@@ -1,6 +1,7 @@
 import {useState, useEffect} from "react"
 import Points from "./components/Points"
 import Canvas from "./components/Canvas";
+// import {render} from "./js/render"
 
 function App() {
     const [mouseBound, setMouseBound]=useState([
@@ -52,7 +53,7 @@ function App() {
         return points
     }
     const [canvasPoints, setCanvasPoints] = useState(false)
-    
+
     const addDragItem = ()=>{
         const newDragItem={
             ref: null,
@@ -262,6 +263,8 @@ function App() {
         // console.log("dragIs were updated, updating points")
         getCanvasPoints(true)
     }, [dragIs])
+
+
     return (
         <div className="App" 
             // onTouchStart={(e)=>dragStart(e)} 

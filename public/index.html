@@ -38,6 +38,7 @@
               <button className="button minus"></button>
           </div>
       </div> -->
+      <!-- <script src="//webglfundamentals.org/webgl/resources/webgl-utils.js"></script> -->
     <div id="root"></div>
     <!--
       This HTML file is a template.
@@ -49,5 +50,34 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <!-- vertex shader -->
+    <!-- <script id="2d-vertex-shader" type="x-shader/x-vertex">
+      attribute vec2 a_position;
+
+      uniform vec2 u_resolution;
+      uniform mat3 u_matrix;
+
+      varying vec2 v_texCoord;
+
+      void main() {
+
+        gl_Position = vec4(u_matrix * vec3(a_position, 1), 1);
+        v_texCoord = a_position;
+      }
+    </script> -->
+    <!-- fragment shader -->
+    <!-- <script id="2d-fragment-shader" type="x-shader/x-fragment">
+      precision mediump float;
+
+      // our texture
+      uniform sampler2D u_image;
+
+      // the texCoords passed in from the vertex shader.
+      varying vec2 v_texCoord;
+
+      void main() {
+        gl_FragColor = texture2D(u_image, v_texCoord);
+      }
+    </script> -->
   </body>
 </html>
