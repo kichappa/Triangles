@@ -33,7 +33,7 @@ const Canvas = ({id, canvasPoints}) => {
     const getColor=(position)=>{
         // let dist = distances(position, points)
         let invSum = 0
-        let hsv = [0,0,0]
+        let hsv = [0,0,0, 255]
         // var t1, t0
         // t0 = Date.now()
         let colour = points[0].colour
@@ -51,10 +51,14 @@ const Canvas = ({id, canvasPoints}) => {
             // hsv.s += 1/d*points[i].colour.s
             // hsv.v += 1/d*points[i].colour.v      
             
+            // colour = points[i].colour
+            // hsv[0] += 1/d*colour.h
+            // hsv[1] += 1/d*colour.s
+            // hsv[2] += 1/d*colour.v 
             colour = points[i].colour
-            hsv[0] += 1/d*colour.h
-            hsv[1] += 1/d*colour.s
-            hsv[2] += 1/d*colour.v     
+            hsv[0] += 1/d*colour.r
+            hsv[1] += 1/d*colour.g
+            hsv[2] += 1/d*colour.b    
             // t1=Date.now()-t0
             // if(t1) console.log("hsv elapsed=", t1)
             // console.log("hsv is ", hsv)
@@ -65,7 +69,8 @@ const Canvas = ({id, canvasPoints}) => {
         hsv[0] /= invSum
         hsv[1] /= invSum
         hsv[2] /= invSum
-        return hsvToRgb(hsv)
+        // return hsvToRgb(hsv)
+        return hsv
     }
 
     const shootPixel=()=>{

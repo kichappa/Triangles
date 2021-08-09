@@ -44,7 +44,7 @@ function App() {
                 points[i] = {
                     x: dragIs[i].currentXY.x+dragIs[i].size[0]/2,
                     y: dragIs[i].currentXY.y+dragIs[i].size[1]/2,
-                    colour: dragIs[i].colour.hsv
+                    colour: dragIs[i].colour.rgb
                 }
             }
         }
