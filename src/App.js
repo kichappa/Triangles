@@ -120,6 +120,7 @@ function App() {
             setMouseBound(mouseBound)
             if(!isClick(mouseBound.start, mouseBound.end)){
                 onPicker(dragIs[index], false)
+                closePickers(index)
             }
             dragIs[index].currentXY.x = clientXY.x - dragIs[index].pointerOffset.x
             dragIs[index].currentXY.y = clientXY.y - dragIs[index].pointerOffset.y
@@ -162,6 +163,7 @@ function App() {
             // console.log("mouseEnd", mouseBound.end)
             // console.log(e, dragIs[index].showPicker)
             if(isClick(mouseBound.start, mouseBound.end) && !dragIs[index].showPicker){
+                closePickers(index)
                 dragIs[index].ref.current.classList.add("active")
                 dragIs[index].ref.current.parentNode.style.zIndex = 1;
                 onPicker(dragIs[index], true)
@@ -175,6 +177,14 @@ function App() {
             setDragIs([...dragIs])
         }
     }
+    const closePickers=(index)=>{
+        for(let i in dragIs){
+            dragIs[i].showPicker=false
+            dragIs[i].ref.current.classList.remove("active")
+        }
+        dragIs[index].ref.current.classList.add("active")
+        setDragIs(dragIs)
+    }
     const isAnyAcive=()=>{
         let active = false;
         for (let i in dragIs){
@@ -182,7 +192,7 @@ function App() {
         }
         return active;
     }
-    const isPickerShowing=()=>{
+    const isPickerActive=()=>{
         let showPicker = false;
         for (let i in dragIs){
             showPicker = showPicker || dragIs[i].showPicker; 

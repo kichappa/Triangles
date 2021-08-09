@@ -48,6 +48,8 @@ const Point = ({className, point, onChangeColor}) => {
             <SketchPicker
                 color={color}
                 onChange={ChangeColor}
+                disableAlpha={true}
+                presetColors={[]}
             />}
         </div>
     )
