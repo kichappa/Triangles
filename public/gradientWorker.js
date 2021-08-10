@@ -12,17 +12,29 @@ const distance = (position, point)=>{
 
 const rgbToHue=rgb=>{
     // Using the method provided at https://en.wikipedia.org/wiki/HSL_and_HSV#Hue_and_chroma
-    var M, m, C, hue
+    var M, m, C, hue, c
     M=Math.max(...rgb)
     m=Math.min(...rgb)
     C = M-m
-    if(C===0) hue=null
-    else if (M===rgb[0]) hue=((rgb[1]-rgb[2])/C % 6)
-    else if (M===rgb[1]) hue=((rgb[2]-rgb[3])/C +2)
-    else if (M===rgb[2]) hue=((rgb[0]-rgb[1])/C +4)
+    if(C===0){ 
+        // hue=0
+        c=0
+    }
+    else if (M===rgb[0]) {
+        hue=((rgb[1]-rgb[2])/C % 6)
+        c=1
+    }
+    else if (M===rgb[1]){ 
+        hue=((rgb[2]-rgb[0])/C +2)
+        c=2
+    }
+    else if (M===rgb[2]){ 
+        hue=((rgb[0]-rgb[1])/C +4)
+        c=3
+    }
     hue *= 60
-    if(hue>360) console.log(hue)
-    return hue
+    hue = (hue % 360 + 360)%360
+    return {hue:hue, M:M, m:m, C:C, c:c}
 }
 
 const hsvToRgb=(hsv)=>{
@@ -80,11 +92,13 @@ const getColor=(position, points)=>{
     rgb[1] /= invSum
     rgb[2] /= invSum
 
-    hsv[0]  = rgbToHue(rgb)
+    hue = rgbToHue(rgb)
+    hsv[0]  = hue.hue
     hsv[1] /= invSum
     hsv[2] /= invSum
     // console.log(hsv, rgb)
-    return {pixel:hsvToRgb(hsv), hsv: hsv, rgb: rgb}
+    return {pixel:hsvToRgb(hsv), hsv: hsv, rgb: rgb, hue:hue}
+    // return {pixel:rgb, hsv: hsv, rgb: rgb, hue:hue}
     // return hsv
 }
 
