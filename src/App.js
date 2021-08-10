@@ -16,45 +16,6 @@ function App() {
             }
         }
     ]);
-    var defaultColour = {
-        "hsl":{"h":53.835616438356155,"s":0.8795180722891567,"l":0.6745098039215687,"a":1},"hex":"#f5e663","rgb":{"r":245,"g":230,"b":99,"a":1},"hsv":{"h":53.835616438356155,"s":0.5959183673469387,"v":0.9607843137254902,"a":1},"oldHue":53.33333333333332,"source":"hex"
-    }
-    const [dragIs, setDragIs] = useState([
-        {   // While not being dragged, [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0), (used in transform: translate3D(X, Y, 0))
-            // While being dragged, 
-            //      pointerOffset[X, Y] stores the pointerOffset X and Y offset of the pointer to the anchor of dragItem
-            //      currentXY[X, Y] stores the total X and Y offsets from the pointerOffset position (0,0).
-            // After a drag event, all [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0); again. 
-            ref: null,
-            active: false,
-            colour: defaultColour,
-            showPicker: false,
-            pointerOffset: {x:0, y:0},
-            currentXY: {x:50, y:50},
-            size: false
-        }
-    ])  
-    const getCanvasPoints=(set)=>{
-        let points = new Array(dragIs.length)
-        // console.log("setting Canvas points")
-        for(let i in dragIs){
-            if(dragIs[i].size){
-                // console.log(dragIs[i].currentXY, dragIs[i].size)
-                // console.log(dragIs[i].colour)
-                points[i] = {
-                    x: dragIs[i].currentXY.x+dragIs[i].size[0]/2,
-                    y: dragIs[i].currentXY.y+dragIs[i].size[1]/2,
-                    colour: dragIs[i].colour
-                    // colour: dragIs[i].colour.hsv
-                }
-            }
-        }
-        // console.log("newCanvasPoints are ", points)
-        if (set) setCanvasPoints(points)
-        return points
-    }
-    const [canvasPoints, setCanvasPoints] = useState(false)
-
     const rgbToHslHsvHex=(rgb)=>{
         var rgbArr = [rgb.r, rgb.g, rgb.b]
         var M, m, C, hue, I, V, L, Sv, Sl
@@ -97,6 +58,47 @@ function App() {
         return {rgb: rgb, hsv:hsv, hsl:hsl, hex:hex}
         // return {rgb: rgb, hsv:hsv, hsl:hsl, hex:hex, M:M, m:m, C:C}
     }
+    var defaultColour = rgbToHslHsvHex({
+        r: Math.random() * 255,
+        g: Math.random() * 255,
+        b: Math.random() * 255,
+    })    
+    const [dragIs, setDragIs] = useState([
+        {   // While not being dragged, [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0), (used in transform: translate3D(X, Y, 0))
+            // While being dragged, 
+            //      pointerOffset[X, Y] stores the pointerOffset X and Y offset of the pointer to the anchor of dragItem
+            //      currentXY[X, Y] stores the total X and Y offsets from the pointerOffset position (0,0).
+            // After a drag event, all [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0); again. 
+            ref: null,
+            active: false,
+            colour: defaultColour,
+            showPicker: false,
+            pointerOffset: {x:0, y:0},
+            currentXY: {x:50, y:50},
+            size: false
+        }
+    ])  
+    const getCanvasPoints=(set)=>{
+        let points = new Array(dragIs.length)
+        // console.log("setting Canvas points")
+        for(let i in dragIs){
+            if(dragIs[i].size){
+                // console.log(dragIs[i].currentXY, dragIs[i].size)
+                // console.log(dragIs[i].colour)
+                points[i] = {
+                    x: dragIs[i].currentXY.x+dragIs[i].size[0]/2,
+                    y: dragIs[i].currentXY.y+dragIs[i].size[1]/2,
+                    colour: dragIs[i].colour
+                    // colour: dragIs[i].colour.hsv
+                }
+            }
+        }
+        // console.log("newCanvasPoints are ", points)
+        if (set) setCanvasPoints(points)
+        return points
+    }
+    const [canvasPoints, setCanvasPoints] = useState(false)
+
     const addDragItem = ()=>{
         var currentXY={x:50, y:50}, colour
         if(dragIs.length>0){
