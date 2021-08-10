@@ -44,7 +44,8 @@ function App() {
                 points[i] = {
                     x: dragIs[i].currentXY.x+dragIs[i].size[0]/2,
                     y: dragIs[i].currentXY.y+dragIs[i].size[1]/2,
-                    colour: dragIs[i].colour.rgb
+                    colour: dragIs[i].colour
+                    // colour: dragIs[i].colour.hsv
                 }
             }
         }
@@ -173,6 +174,14 @@ function App() {
             // console.log("None active")
             // console.log(e)
             dragStart(e)
+        }else{
+            // var target = document.elementFromPoint(e.clientX, e.clientY)
+            // // console.log(target)
+            // try{
+            //     if(target.tagName==="CANVAS")
+            //         console.log(target.getContext('2d').getImageData(e.clientX, e.clientY, 1, 1).data)
+            // }
+            // catch{}
         }
     }
     const dragEnd = (e)=>{
