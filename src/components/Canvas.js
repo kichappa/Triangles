@@ -33,7 +33,7 @@ const Canvas = ({id, canvasPoints}) => {
     const getColor=(position)=>{
         // let dist = distances(position, points)
         let invSum = 0
-        let hsv = [0,0,0, 255]
+        let hsv = [0,0,0]//, 255]
         // var t1, t0
         // t0 = Date.now()
         let colour = points[0].colour
@@ -83,6 +83,7 @@ const Canvas = ({id, canvasPoints}) => {
         // console.log(canvas.current.offsetWidth, canvas.current.offsetHeight)
         // console.log(canvas.current.width, canvas.current.height)
         // getColor({x:100,y:100}, points)
+        console.log(imageData.data.length)
         if(points){
             // let rgb = hsvToRgb(getColor({x:100,y:100}, points))
             // console.log("hello", points, points.length)
@@ -91,18 +92,23 @@ const Canvas = ({id, canvasPoints}) => {
             // var t1, t0
             // t0 = Date.now()
             // var hsv = new Array(4*canvas.current.width, canvas.current.height)
-            let count=0
-            for(let y=0;y<canvas.current.width;y++){
-                for(let x=0;x<canvas.current.width;x++){
+            let count=0, a=0
+            // for(let y=0;y<canvas.current.width;y++){
+            //     for(let x=0;x<canvas.current.width;x++){
+                for (var i = 0; i < imageData.data.length; i += 4) {
+                    // let x, y
+                    var x = Math.floor(i/4) % canvas.current.width
+                    var y = Math.floor(Math.floor(i/4)/canvas.current.width)
                     let pixel = getColor({x:x,y:y})
                     // console.log(pixel)
-                    imageData.data[count++] = pixel[0]
-                    imageData.data[count++] = pixel[1]
-                    imageData.data[count++] = pixel[2]
-                    imageData.data[count++] = pixel[3]
+                    imageData.data[i] = pixel[0]
+                    imageData.data[i+1] = pixel[1]
+                    imageData.data[i+2] = pixel[2]
+                    imageData.data[i+3] = 255
                     // count++
                 }
-            }
+            // }
+            console.log(count)
             // console.log(imageData.data)
             // t1=Date.now()-t0
             // console.log("HSV over")
