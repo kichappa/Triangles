@@ -83,7 +83,7 @@ const Canvas = ({id, canvasPoints}) => {
         // console.log(canvas.current.offsetWidth, canvas.current.offsetHeight)
         // console.log(canvas.current.width, canvas.current.height)
         // getColor({x:100,y:100}, points)
-        console.log(imageData.data.length)
+        // console.log(imageData.data.length)
         if(points){
             // let rgb = hsvToRgb(getColor({x:100,y:100}, points))
             // console.log("hello", points, points.length)
@@ -108,7 +108,7 @@ const Canvas = ({id, canvasPoints}) => {
                     // count++
                 }
             // }
-            console.log(count)
+            // console.log(count)
             // console.log(imageData.data)
             // t1=Date.now()-t0
             // console.log("HSV over")
