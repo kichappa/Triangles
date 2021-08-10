@@ -8,6 +8,13 @@ const Canvas = ({id, canvasPoints}) => {
     const [points, setPoints]=useState(canvasPoints)
     const [canvas, setCanvas]=useState(useRef(null))
 
+    const draw=(imageData)=>{
+            var ctx = canvas.current.getContext('2d')
+            // console.log("imageData is", imageData)
+            // console.log("imageData is", typeof(imageData))
+            ctx.putImageData(imageData, 0, 0);
+        window.requestAnimationFrame(()=>draw(imageData))
+    }
     const shootPixel=()=>{
         var ctx = canvas.current.getContext('2d')
         canvas.current.width = canvas.current.offsetWidth
@@ -42,7 +49,9 @@ const Canvas = ({id, canvasPoints}) => {
             // console.log("a", e)
             // console.log("b", e.data)
             if (imDataLength === e.data.imageData.data.length){
-                ctx.putImageData(e.data.imageData, 0, 0);
+                // ctx.putImageData(e.data.imageData, 0, 0);
+                console.log("blah", e.data.imageData)
+                draw(e.data.imageData)
             }
         }
         // if(points){
