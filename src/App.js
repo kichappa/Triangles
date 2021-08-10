@@ -55,14 +55,76 @@ function App() {
     }
     const [canvasPoints, setCanvasPoints] = useState(false)
 
+    const rgbToHslHsvHex=(rgb)=>{
+        var rgbArr = [rgb.r, rgb.g, rgb.b]
+        var M, m, C, hue, I, V, L, Sv, Sl
+        M=Math.max(...rgbArr)
+        m=Math.min(...rgbArr)
+        C = M-m
+        I = (rgbArr[0]+rgbArr[1]+rgbArr[2])/3
+        // Hue
+        if(C===0) hue=0
+        else if (M===rgbArr[0]) hue=((rgbArr[1]-rgbArr[2])/C % 6)
+        else if (M===rgbArr[1]) hue=((rgbArr[2]-rgbArr[0])/C +2)
+        else if (M===rgbArr[2]) hue=((rgbArr[0]-rgbArr[1])/C +4)
+        hue *= 60
+        // Lightness and Value
+        V = M/255
+        L = (M+m)/(2*255)
+        // Saturation
+        if (V===0) Sv=0
+        else Sv=C/(V*255)
+        if (L===1 || L===0) Sl=0
+        else Sl=C/(255*(1-Math.abs(2*L-1)))
+        
+        hue = (hue % 360 + 360)%360
+        // L = (L % 1 + 1)%1
+        // V = (V % 1 + 1)%1
+        // Sv = (Sv % 1 + 1)%1
+        // Sl = (Sl % 1 + 1)%1
+        let hsv = {h: hue, s: Sv, v: V, a:1}
+        let hsl = {h: hue, s: Sl, l: L, a:1}
+        rgb.a = 1
+        let hex="#"
+        for(let i in rgbArr){
+            let colorcode = Math.floor(rgbArr[i]).toString(16)
+            // console.log(rgbArr[i], colorcode.length, 2-colorcode.length, "#"+"0".repeat(0), "#"+"0".repeat(1), "#"+"0".repeat(2))
+            hex+="0".repeat(2-colorcode.length)+colorcode
+            // if (colorcode.length===2){
+            //     hex+=colorcode
+            // }else
+        }
+        return {rgb: rgb, hsv:hsv, hsl:hsl, hex:hex}
+        // return {rgb: rgb, hsv:hsv, hsl:hsl, hex:hex, M:M, m:m, C:C}
+    }
     const addDragItem = ()=>{
+        var currentXY={x:50, y:50}, colour
+        if(dragIs.length>0){
+            var boundXY = [[0,0],[0,0]]
+            boundXY[1] = [
+                boundXY[0][0]+dragIs[0].ref.current.parentNode.parentNode.clientWidth-dragIs[0].size[0], 
+                boundXY[0][1]+dragIs[0].ref.current.parentNode.parentNode.clientHeight-dragIs[0].size[1]
+            ]
+            let x, y
+            x=Math.floor((Math.random() * boundXY[1][0]) + boundXY[0][0])
+            y=Math.floor((Math.random() * boundXY[1][1]) + boundXY[0][1])
+            currentXY={x:x, y:y}
+        }
+        colour={
+            r: Math.random() * 255,
+            g: Math.random() * 255,
+            b: Math.random() * 255,
+        }
+        colour = rgbToHslHsvHex(colour)
+        // console.log(colour)
         const newDragItem={
             ref: null,
             active: false,
-            colour: defaultColour,
+            // colour: defaultColour,
+            colour: colour,
             showPicker: false,
             pointerOffset: {x:0, y:0},
-            currentXY: {x:50, y:50},
+            currentXY: currentXY,
             size: false
         }
         setDragIs([...dragIs, newDragItem])

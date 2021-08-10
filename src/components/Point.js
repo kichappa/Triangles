@@ -10,6 +10,14 @@ const Point = ({className, points, onChangeColor, index}) => {
     //     fullColor: points[index].colour
     // })
     // console.log(color[0])
+    var colour
+    if(points[index].colour.hex){
+        colour = points[index].colour.hex
+        // console.log("hi "+index, points[index].colour.hex)
+    }else{
+        colour = points[index].colour
+        // console.log("hello "+index, points[index].colour)
+    }
     const styles = reactCSS({
         'default':{
             container: {
@@ -19,7 +27,7 @@ const Point = ({className, points, onChangeColor, index}) => {
             },
             point: {
                 // backgroundColor: color.color,
-                backgroundColor: points[index].colour.hex,
+                backgroundColor: colour,
             },
             picker:{
                 position: 'fixed'
@@ -58,7 +66,7 @@ const Point = ({className, points, onChangeColor, index}) => {
                     position: 'fixed'
                 }}
                 // color={color.color}
-                color={points[index].colour.hex}
+                color={colour}
                 // onChange={changeColor}
                 onChange={(color)=>onChangeColor(index, color)}
                 disableAlpha={true}
