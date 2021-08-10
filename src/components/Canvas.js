@@ -50,7 +50,7 @@ const Canvas = ({id, canvasPoints}) => {
             // console.log("b", e.data)
             if (imDataLength === e.data.imageData.data.length){
                 // ctx.putImageData(e.data.imageData, 0, 0);
-                console.log("blah", e.data.imageData)
+                // console.log("blah", e.data.imageData)
                 draw(e.data.imageData)
             }
         }
