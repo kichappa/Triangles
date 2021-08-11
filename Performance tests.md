@@ -1,6 +1,6 @@
 # Performance Testing
 ## Accessing Object vs Array
----
+
 
 The code is setup as follows.
 ```
@@ -21,7 +21,7 @@ for (let i in rgbArr)
   ans+=rgbArr[i];
 ```
 ### Results
-The results for the test is accessible [here](https://jsben.ch/12NtU)
+The results for the test is accessible [here](https://jsben.ch/12NtU).
 
 |#|Method|Score|
 |:--:|--:|:--|
@@ -31,7 +31,7 @@ The results for the test is accessible [here](https://jsben.ch/12NtU)
 Accessing object seems to be the faster method.
 
 ## Looping Array/Obj and performing math
----
+
 The code is setup as follows.
 ```js
 colour = {hsv: {h:248.61464048872585,s:0.855716645141105,v:0.6475592797293602},
@@ -121,7 +121,7 @@ rgb.g += 1/d*rgbArr[1];
 rgb.b += 1/d*rgbArr[2];
 ```
 ### Results
-The results for the test is accessible [here](https://jsben.ch/12NtU)
+The results for the test is accessible [here](https://jsben.ch/5QEnA).
 
 |#|Method|Score|
 |:--:|--:|:--|
