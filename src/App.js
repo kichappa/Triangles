@@ -180,7 +180,6 @@ function App() {
             }
             mouseBound.end = clientXY
             var target = document.elementFromPoint(clientXY.x, clientXY.y)
-            console.log("drag target is", target)
             setMouseBound(mouseBound)
             if(!isClick(mouseBound.start, mouseBound.end)){
                 onPicker(dragIs[index], false)
@@ -191,7 +190,6 @@ function App() {
                 let boundXY = [[0,0],[0,0]]
                 boundXY[1] = [boundXY[0][0]+dragIs[index].containerRef.current.parentNode.clientWidth-dragIs[index].size[0], 
                                 boundXY[0][1]+dragIs[index].containerRef.current.parentNode.clientHeight-dragIs[index].size[1]]
-                console.log("x, y = ", [Math.max(Math.min(currentXY.x, boundXY[1][0]), boundXY[0][0]), Math.max(Math.min(currentXY.y, boundXY[1][1]), boundXY[0][1])])
                 dragIs[index].currentXY.x = Math.max(Math.min(currentXY.x, boundXY[1][0]), boundXY[0][0])
                 dragIs[index].currentXY.y = Math.max(Math.min(currentXY.y, boundXY[1][1]), boundXY[0][1])
                 

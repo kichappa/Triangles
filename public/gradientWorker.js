@@ -10,6 +10,8 @@ const distance = (position, point)=>{
     return Math.sqrt(Math.pow(point.x-position.x,2) + Math.pow(point.y-position.y,2))
 }
 
+const computeTime = {invSum: 0, rgb: 0, hue:0, hsv: 0}
+
 const rgbToHue=rgb=>{
     // Using the method provided at https://en.wikipedia.org/wiki/HSL_and_HSV#Hue_and_chroma
     var M, m, C, hue, c
@@ -53,12 +55,12 @@ const hsvToRgb=(hsv)=>{
     return rgb
 }
 
-const getColor=(position, points)=>{
+const getColor=(position, points, log)=>{
     // let dist = distances(position, points)
     let invSum = 0
     let hsv = [0,0,0], rgb = [0,0,0] //, 255]
-    // var t1, t0
-    // t0 = Date.now()
+    var t1, t0
+    t0 = Date.now()
     let colour = points[0].colour
     for(let i in points){
         // console.log("distance from point "+i+" is"+distance(position, points[i]))
@@ -85,17 +87,30 @@ const getColor=(position, points)=>{
         // if(t1) console.log("hsv elapsed=", t1)
         // console.log("hsv is ", hsv)
     }
-    // t1=Date.now()-t0
-    // if(t1) console.log("hsv elapsed=", t1)   
+    t1=Date.now()-t0
+    // if(!log) console.log("sv*invSum, rgb*invSum time elapsed=", t1)   
+    computeTime.invSum += t1
+    t0 = Date.now()
     // console.log("hsv is ", hsv)
     rgb[0] /= invSum
     rgb[1] /= invSum
     rgb[2] /= invSum
 
+    t1=Date.now()-t0
+    if(!log) console.log("rgb time elapsed=", t1)   
+    computeTime.rgb += t1
+    t0 = Date.now()
     hue = rgbToHue(rgb)
+    t1=Date.now()-t0
+    if(!log) console.log("hue time elapsed=", t1)   
+    computeTime.hue += t1
+    t0 = Date.now()
     hsv[0]  = hue.hue
     hsv[1] /= invSum
     hsv[2] /= invSum
+    t1=Date.now()-t0
+    if(!log) console.log("hsv time elapsed=", t1)   
+    computeTime.hsv += t1
     // console.log(hsv, rgb)
     return {pixel:hsvToRgb(hsv), hsv: hsv, rgb: rgb, hue:hue}
     // return {pixel:rgb, hsv: hsv, rgb: rgb, hue:hue}
@@ -126,7 +141,7 @@ onmessage = (e)=>{
         for (var i = 0; i < imageData.data.length; i += 4) {
                 var x = Math.floor(i/4) % canvas.width
                 var y = Math.floor(Math.floor(i/4)/canvas.width)
-                let pixel = getColor({x:x,y:y}, points)
+                let pixel = getColor({x:x,y:y}, points, i)
                 if(x===10 && y===10) {
                     console.log("at ["+[x,y]+"]",pixel)
                     // console.log(pixel)
@@ -137,6 +152,10 @@ onmessage = (e)=>{
                 imageData.data[i+3] = 255
             }
         var t1=Date.now()-t0
+        console.log("invSum time elapsed=", computeTime.invSum)   
+        console.log("rgb time elapsed=", computeTime.rgb)   
+        console.log("hue time elapsed=", computeTime.hue)   
+        console.log("hsv time elapsed=", computeTime.hsv)   
         console.log("computation time "+t1+"ms")
         postMessage({imageData})
     }
