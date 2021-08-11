@@ -37,7 +37,7 @@
     border-radius: 50%;
     touch-action: none;
     user-select: none;
-    transition: all 0.2s ease-out;
+    transition: all 0.2s cubic-bezier(.39,.58,.57,1);
     /* transition-timing-function: ease-out; */
 }
 

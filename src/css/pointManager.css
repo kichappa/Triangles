@@ -47,7 +47,7 @@
     border-radius: 6px;
     padding: 0 10px 0 10px;
     /* transition: background-color 0.3s, color 0.3s; */
-    transition: box-shadow 0.1s;
+    transition: all 0.5s cubic-bezier(.39,.58,.57,1);
 }
 
 @media (hover: hover) and (pointer: fine) {
