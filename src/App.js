@@ -49,14 +49,9 @@ function App() {
         let hex="#"
         for(let i in rgbArr){
             let colorcode = Math.floor(rgbArr[i]).toString(16)
-            // console.log(rgbArr[i], colorcode.length, 2-colorcode.length, "#"+"0".repeat(0), "#"+"0".repeat(1), "#"+"0".repeat(2))
             hex+="0".repeat(2-colorcode.length)+colorcode
-            // if (colorcode.length===2){
-            //     hex+=colorcode
-            // }else
         }
         return {rgb: rgb, hsv:hsv, hsl:hsl, hex:hex}
-        // return {rgb: rgb, hsv:hsv, hsl:hsl, hex:hex, M:M, m:m, C:C}
     }
     var defaultColour = rgbToHslHsvHex({
         r: Math.random() * 255,
@@ -81,20 +76,15 @@ function App() {
     ])  
     const getCanvasPoints=(set)=>{
         let points = new Array(dragIs.length)
-        // console.log("setting Canvas points")
         for(let i in dragIs){
             if(dragIs[i].size){
-                // console.log(dragIs[i].currentXY, dragIs[i].size)
-                // console.log(dragIs[i].colour)
                 points[i] = {
                     x: dragIs[i].currentXY.x+dragIs[i].size[0]/2,
                     y: dragIs[i].currentXY.y+dragIs[i].size[1]/2,
                     colour: dragIs[i].colour
-                    // colour: dragIs[i].colour.hsv
                 }
             }
         }
-        // console.log("newCanvasPoints are ", points)
         if (set) setCanvasPoints(points)
         return points
     }
@@ -119,12 +109,10 @@ function App() {
             b: Math.random() * 255,
         }
         colour = rgbToHslHsvHex(colour)
-        // console.log(colour)
         const newDragItem={
             ref: null,
             containerRef: null,
             active: false,
-            // colour: defaultColour,
             colour: colour,
             showPicker: false,
             pointerOffset: {x:0, y:0},
@@ -149,27 +137,14 @@ function App() {
         setMouseBound(mouseBound)
         // capturing target since touch and mouse output different e.target
         var target = document.elementFromPoint(e.clientX, e.clientY)
-        // if (e.pointerType === "touch"){
-        //         target = document.elementFromPoint(e.clientX, e.clientY)
-        // }else{
-        //         target = e.target
-        // }
-        // if(!target.id==="dragPalette"){
-        //     console.log(target)
-        // }
         if(target.classList.contains("dragItem")){
-            // console.log("Target is",target)
             var index
             for(let i in dragIs){
                 if(dragIs[i].pointRef.current === target){
-                    // console.log("now "+ i)
                     index = i
                 }
             }
-
-            // console.log(dragIs[index])     
             console.log("dragStart "+index, dragIs[index])
-            // setting pointerOffset values at the start of a drag 
             let clientXY = {x:0, y:0}
             if (e.type.substr(0,5) === "touch") {
                 clientXY = {x: e.touches[0].clientX, y: e.touches[0].clientY}
@@ -179,15 +154,11 @@ function App() {
             mouseBound.start = clientXY
             mouseBound.end = clientXY
             setMouseBound(mouseBound)
-            // console.log("Setting mouseBound", mouseBound)
             dragIs[index].pointerOffset.x = clientXY.x - dragIs[index].currentXY.x
             dragIs[index].pointerOffset.y = clientXY.y - dragIs[index].currentXY.y
-            // console.log("dragStart ", dragIs[index].object.getBoundingClientRect().left, dragIs[index].object.getBoundingClientRect().top)
-            // console.log("dragStart initX, initY = [" + [dragIs[index].pointerOffset[0], dragIs[index].pointerOffset[1]] + "]")
             dragIs[index].active = true
             dragIs[index].pointRef.current.classList.add("active")
             dragIs[index].containerRef.current.style.zIndex = 1
-            // console.log("Now dragIs[index] is", dragIs[index])
             setDragIs([...dragIs])
         }
     }
@@ -199,9 +170,7 @@ function App() {
                     index = i
                 }
             }
-            // console.log("Pushing...")
             e.preventDefault();
-
             // Calculating current XY 
             let clientXY = {x:0, y:0}
             if (e.type.substr(0,5) === "touch") {
@@ -219,29 +188,17 @@ function App() {
                 var currentXY={x:0, y:0}
                 currentXY.x = clientXY.x - dragIs[index].pointerOffset.x
                 currentXY.y = clientXY.y - dragIs[index].pointerOffset.y
-                
-                // let boundXY = [[dragIs[index].pointRef.current.parentNode.parentNode.getBoundingClientRect().left, 
-                //                 dragIs[index].pointRef.current.parentNode.parentNode.getBoundingClientRect().top
-                //                 ],
-                //                 [0,0]
-                //             ]
                 let boundXY = [[0,0],[0,0]]
                 boundXY[1] = [boundXY[0][0]+dragIs[index].containerRef.current.parentNode.clientWidth-dragIs[index].size[0], 
                                 boundXY[0][1]+dragIs[index].containerRef.current.parentNode.clientHeight-dragIs[index].size[1]]
-                // console.log("boundXY is", boundXY);
                 console.log("x, y = ", [Math.max(Math.min(currentXY.x, boundXY[1][0]), boundXY[0][0]), Math.max(Math.min(currentXY.y, boundXY[1][1]), boundXY[0][1])])
                 dragIs[index].currentXY.x = Math.max(Math.min(currentXY.x, boundXY[1][0]), boundXY[0][0])
                 dragIs[index].currentXY.y = Math.max(Math.min(currentXY.y, boundXY[1][1]), boundXY[0][1])
-                // dragIs[index].containerRef.current.style.left = dragIs[index].currentXY.x
-                // dragIs[index].containerRef.current.style.top = dragIs[index].currentXY.y
-                // console.log("dragIs[index] is", dragIs[index])
                 
                 setDragIs([...dragIs])
             }
 
         }else if(mouseBound.mouseDown){
-            // console.log("None active")
-            // console.log(e)
             dragStart(e)
         }else{
             // var target = document.elementFromPoint(e.clientX, e.clientY)
@@ -264,10 +221,6 @@ function App() {
             dragIs[index].pointerOffset.x = dragIs[index].currentXY.x;
             dragIs[index].pointerOffset.y = dragIs[index].currentXY.y;
             dragIs[index].active = false;
-            
-            // console.log("mouseStart", mouseBound.start)
-            // console.log("mouseEnd", mouseBound.end)
-            // console.log(e, dragIs[index].showPicker)
             if(isClick(mouseBound.start, mouseBound.end) && !dragIs[index].showPicker){
                 closePickers(index)
                 dragIs[index].pointRef.current.classList.add("active")
@@ -309,10 +262,7 @@ function App() {
         return showPicker;
     }
     const onPicker=(point, state)=>{
-        // if(state)
-        //     point.showPicker = !point.showPicker
-        // else
-            point.showPicker = state
+        point.showPicker = state
     }
     const isClick=(startXY, endXY)=>{
         let tol=5
@@ -322,9 +272,7 @@ function App() {
     const initSizes=()=>{
         let update = false
         for (let i in dragIs){
-            // console.log(!dragIs[i].size)
             if(!dragIs[i].size){
-                // console.log("setting size for "+i )
                 update = true
                 dragIs[i].size = [dragIs[i].pointRef.current.offsetWidth, dragIs[i].pointRef.current.offsetHeight]
             }
@@ -332,35 +280,33 @@ function App() {
         if(update) setDragIs(dragIs)
     } 
     const onChangeColor=(index, color)=>{
-        // console.log("changing color of "+ index, color)
         let newDragIs = [...dragIs]
         newDragIs[index].colour = color
         setDragIs([...newDragIs])
     }
     useEffect(() => {
-        // console.log("dragIs were updated, updating points")
         getCanvasPoints(true)
     }, [dragIs])
 
 
     return (
         <div className="App" 
-            // onTouchStart={(e)=>dragStart(e)} 
-            // onMouseDown={(e)=>dragStart(e)}
-            // onTouchMove={(e)=>drag(e)} 
-            // onMouseMove={(e)=>drag(e)}
-            // onTouchEnd={(e)=>dragEnd(e)} 
-            // onMouseUp={(e)=>dragEnd(e)}
-
             onPointerDown={(e)=>dragStart(e)} 
             onPointerMove={(e)=>drag(e)} 
             onPointerUp={(e)=>dragEnd(e)} 
         >
             <div id="outerContainer">
                 <div id="dragPalette">
-                    <Canvas id={"gradientPalette"} canvasPoints={canvasPoints}/>
+                    <Canvas 
+                        id={"gradientPalette"} 
+                        canvasPoints={canvasPoints}
+                    />
                 </div>
-                    <Points points={dragIs} onRender={initSizes} onChangeColor={onChangeColor}/>
+                    <Points 
+                        points={dragIs} 
+                        onRender={initSizes} 
+                        onChangeColor={onChangeColor}
+                    />
                 <div id="point-manager">
                         <button className="button plus" onClick={addDragItem}></button>
                         <button className="button minus" onClick={()=> removeDragItem({index: -1})}></button>

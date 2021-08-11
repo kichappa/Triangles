@@ -5,40 +5,20 @@
     top:0;
     left: 0;
     touch-action: none;
-    /* display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-around;
-    align-items: center;
-    align-content: stretch; */
-
-    /* overflow: hidden; */
     border-radius: 20px;
     touch-action: none;
 }
 
-/* #dragPalette{
-    position: relative;
-}
-#gradientPalette{
-    position: absolute;
-} */
-
 .dragItem {
     z-index: 1;
     touch-action: none;
-    /* position: absolute; */
-    /* top: calc(0% + 50px);
-    left: calc(0% + 50px); */
     width: 20px;
     height: 20px;
-    /* background-color: #f5e663; */
     border: 3px solid #ffffff;
     border-radius: 50%;
     touch-action: none;
     user-select: none;
     transition: all 0.2s cubic-bezier(.39,.58,.57,1);
-    /* transition-timing-function: ease-out; */
 }
 
 
@@ -47,16 +27,13 @@
     .dragItem:hover, .dragItem:active, .dragItem.active{
         cursor: pointer;
         border-width: 8px;
-        /* margin: -5px; */
     }
 
 }
 
 @media (hover: none) and (pointer: coarse) {
     .dragItem:active, .dragItem:focus, .dragItem.active{
-        /* cursor: pointer; */
         border-width: 8px;
-        /* margin: -5px; */
     }
 }
 
@@ -71,5 +48,4 @@
 
 .dragIContainer .sketch-picker {
     transform: translate(calc(-50% + 18px), 2px);
-    /* (calc(-50% + 18px), 2px, 0); */
 }
