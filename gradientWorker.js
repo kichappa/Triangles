@@ -122,6 +122,7 @@ onmessage = (e)=>{
     let imageData = e.data.imageData, points = e.data.points, canvas = e.data.canvas
     if(points){
         var t0 = Date.now()
+        // const data = imageData.data; 
         for (var i = 0; i < imageData.data.length; i += 4) {
                 var x = Math.floor(i/4) % canvas.width
                 var y = Math.floor(Math.floor(i/4)/canvas.width)
