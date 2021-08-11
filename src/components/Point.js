@@ -21,16 +21,26 @@ const Point = ({className, points, onChangeColor, index}) => {
     const styles = reactCSS({
         'default':{
             container: {
-                position: 'absolute',
                 left: points[index].currentXY.x,
                 top: points[index].currentXY.y,
+                // display: 'fixed'
+                
+            },
+            pointContainer: {
+                // position: 'absolute',
+                display: 'flex',
+                justifyContent: 'center',
+	            alignItems: 'center',
+                height: '36px',
+                width: '36px',
+                flexWrap: 'nowrap'
             },
             point: {
                 // backgroundColor: color.color,
                 backgroundColor: colour,
             },
             picker:{
-                position: 'fixed'
+                // position: 'fixed'
             }
         },
     })
@@ -49,17 +59,20 @@ const Point = ({className, points, onChangeColor, index}) => {
         // setColor({color: color.hex, fullColor: color})
         // onChangeColor(index, color)
     }
-    points[index].ref = useRef(null)
+    points[index].pointRef = useRef()
+    points[index].containerRef = useRef()
     
     return (
-        <div style={styles.container}>
-            <div 
-                ref={points[index].ref} 
-                style={styles.point} 
-                className="dragItem" 
-                id={points[index].id}
-                // onClick={onClick(points[index])}
-            />
+        <div className="dragIContainer" style={styles.container} ref={points[index].containerRef} >
+            <div style={styles.pointContainer}>
+                <div 
+                    ref={points[index].pointRef} 
+                    style={styles.point} 
+                    className="dragItem" 
+                    id={points[index].id}
+                    // onClick={onClick(points[index])}
+                />
+            </div>
             {points[index].showPicker && 
             <SketchPicker
                 style={{

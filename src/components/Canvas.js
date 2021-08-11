@@ -51,7 +51,10 @@ const Canvas = ({id, canvasPoints}) => {
             if (imDataLength === e.data.imageData.data.length){
                 // ctx.putImageData(e.data.imageData, 0, 0);
                 // console.log("blah", e.data.imageData)
+                var t0 = Date.now()
                 draw(e.data.imageData)
+                var t1=Date.now()-t0
+                console.log("drawing time "+t1+"ms")  
             }
         }
         // if(points){

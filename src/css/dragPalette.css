@@ -12,8 +12,8 @@
     align-items: center;
     align-content: stretch; */
 
-    overflow: hidden;
-    /* border-radius: 7px; */
+    /* overflow: hidden; */
+    border-radius: 20px;
     touch-action: none;
 }
 
@@ -37,34 +37,39 @@
     border-radius: 50%;
     touch-action: none;
     user-select: none;
-    transition: border-width 0.2s, margin 0.2s;
+    transition: all 0.2s ease-out;
+    /* transition-timing-function: ease-out; */
 }
 
 
 
 @media (hover: hover) and (pointer: fine) {
-    .dragItem:hover {
+    .dragItem:hover, .dragItem:active, .dragItem.active{
         cursor: pointer;
         border-width: 8px;
-        margin: -5px;
+        /* margin: -5px; */
     }
 
-    .dragItem:active {
-        background-color: rgba(168, 218, 220, 1.00);
-    }
 }
 
 @media (hover: none) and (pointer: coarse) {
-    .dragItem:active, .dragItem:focus{
+    .dragItem:active, .dragItem:focus, .dragItem.active{
         /* cursor: pointer; */
         border-width: 8px;
-        margin: -5px;
-        background-color: rgba(168, 218, 220, 1.00);
+        /* margin: -5px; */
     }
-    .dragItem.active{
-        /* cursor: pointer; */
-        border-width: 8px;
-        margin: -5px;
-        background-color: rgba(168, 218, 220, 1.00);
-    }
+}
+
+.dragIContainer{    
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.dragIContainer .sketch-picker {
+    transform: translate(calc(-50% + 18px), 2px);
+    /* (calc(-50% + 18px), 2px, 0); */
 }
