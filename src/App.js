@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Points from "./components/Points";
 import Canvas from "./components/Canvas";
-// import {render} from "./js/render"
 
 function App() {
     const [mouseBound, setMouseBound] = useState([
@@ -237,13 +236,16 @@ function App() {
         } else if (mouseBound.mouseDown) {
             dragStart(e);
         } else {
-            // var target = document.elementFromPoint(e.clientX, e.clientY)
+            // var target = document.elementFromPoint(e.clientX, e.clientY);
             // // console.log(target)
-            // try{
-            //     if(target.tagName==="CANVAS")
-            //         console.log(target.getContext('2d').getImageData(e.clientX, e.clientY, 1, 1).data)
-            // }
-            // catch{}
+            // try {
+            //     if (target.tagName === "CANVAS")
+            //         console.log(
+            //             target
+            //                 .getContext("2d")
+            //                 .getImageData(e.clientX, e.clientY, 1, 1).data
+            //         );
+            // } catch {}
         }
     };
     const dragEnd = (e) => {
