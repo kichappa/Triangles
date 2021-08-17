@@ -104,7 +104,7 @@ const getFragmentShader = (length) => {
 };
 
 const renderGradient = (points, canvas) => {
-    if (points) {
+    if (points && points.length > 0) {
         // accessing WebGL2 context from canvas
         const gl = canvas.getContext("webgl2");
 
