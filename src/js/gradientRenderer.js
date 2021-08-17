@@ -1,5 +1,7 @@
 // importing boilerplate functions
-import webglUtils from "../js/webglUtils";
+import createProgramFromSources, {
+    resizeCanvasToDisplaySize,
+} from "../js/webglUtils";
 
 // vertex shader function that is just a function to accompany the fragment shader
 const getVertexShader = () => {
@@ -111,7 +113,7 @@ const renderGradient = (points, canvas) => {
         canvas.height = canvas.offsetHeight;
 
         // creating program using the vs and fs functions above
-        const program = webglUtils.createProgramFromSources(gl, [
+        const program = createProgramFromSources(gl, [
             getVertexShader(),
             getFragmentShader(points.length),
         ]);
@@ -169,7 +171,7 @@ const renderGradient = (points, canvas) => {
         );
 
         // resizing canvas to fit the fill clipspace - not sure why since we already did canvas.width = offsetWidth and all...
-        webglUtils.resizeCanvasToDisplaySize(gl.canvas);
+        resizeCanvasToDisplaySize(gl.canvas);
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
         // Telling WebGL to use our program (with the pair of shaders)
