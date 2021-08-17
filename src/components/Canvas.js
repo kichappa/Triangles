@@ -38,7 +38,7 @@ const Canvas = ({ id, canvasPoints }) => {
             worker.onmessage = (e) => {
                 if (imDataLength === e.data.imageData.data.length) {
                     // var t0 = Date.now();
-                    window.requestAnimationFrame(draw(e.data.imageData));
+                    window.requestAnimationFrame(() => draw(e.data.imageData));
                     // var t1 = Date.now() - t0;
                     // console.log("drawing time " + t1 + "ms");
                 }
@@ -54,6 +54,13 @@ const Canvas = ({ id, canvasPoints }) => {
         setPoints(canvasPoints);
         shootPixel();
     });
+    useEffect(() => {
+        if (!canvas.current.getContext("webgl2")) {
+            alert(
+                "WebGL not available in this browser/platform. Renders may be slower."
+            );
+        }
+    }, []);
     return <canvas id={id} ref={canvas} />;
 };
 

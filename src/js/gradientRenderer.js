@@ -73,7 +73,7 @@ const getFragmentShader = (length) => {
         return rgb;
     }
 
-    float distance(ivec2 pos, ivec2 point){
+    float dist(ivec2 pos, ivec2 point){
         return pow(pow(float(pos.x-point.x), 2.0)+pow(float(pos.y-point.y), 2.0), 0.5);
     }
 
@@ -83,7 +83,7 @@ const getFragmentShader = (length) => {
         float invSum = 0.0;
         vec3 hsv = vec3(0,0,0), rgb = vec3(0,0,0);
         for(int i=0;i<${length};i++){
-            float invD = 1.0/distance(pointsXY[i], position);
+            float invD = 1.0/dist(pointsXY[i], position);
             hsv += invD * pointsHSV[i];
             rgb += invD * pointsRGB[i];
             invSum += invD;
