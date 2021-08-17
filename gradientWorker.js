@@ -7,20 +7,17 @@ const distances = (position, points) => {
     }
     return dist;
 };
-
 const distance = (position, point) => {
     return Math.sqrt(
         Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2)
     );
 };
-
 const computeTime = {
     invSum: 0,
     rgb: 0,
     hue: 0,
     hsv: 0,
 };
-
 const rgbToHue = (rgb) => {
     // Using the method provided at https://en.wikipedia.org/wiki/HSL_and_HSV#Hue_and_chroma
     var M,
@@ -43,7 +40,6 @@ const rgbToHue = (rgb) => {
     return hue;
     return { hue: hue, M: M, m: m, C: C };
 };
-
 const hsvToRgb = (hsv) => {
     // console.log("converting", hsv)
     // Using the alternative method provided at https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB_alternative
@@ -60,7 +56,6 @@ const hsvToRgb = (hsv) => {
     // }
     return rgb;
 };
-
 const getColor = (position, points, log) => {
     let invSum = 0;
     let hsv = [0, 0, 0],
@@ -105,11 +100,12 @@ const getColor = (position, points, log) => {
     return hsvToRgb(hsv);
     return { pixel: hsvToRgb(hsv), hsv: hsv, rgb: rgb, hue: hue };
 };
-
 onmessage = (e) => {
     let imageData = e.data.imageData,
         points = e.data.points,
         canvas = e.data.canvas;
+    console.log(points);
+    console.log(imageData);
     if (points) {
         // var t0 = Date.now();
         const data = imageData.data;
