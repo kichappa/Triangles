@@ -15,14 +15,15 @@ body,
 .App {
     box-sizing: border-box;
     padding: 20px;
-    height: 100vh;
+    height: 100%;
     height: -webkit-fill-available;
+    min-height: -moz-available;
 }
 
 #outerContainer {
     height: 100%;
     width: calc(100vw - 40px);
-    height: -webkit-fill-available;
+    /* height: -webkit-fill-available; */
     /* top:-50px; */
     /* margin: 20px; */
     position: relative;
