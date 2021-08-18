@@ -82,21 +82,28 @@ const getFragmentShader = (length) => {
         ivec2 position = ivec2(v_position);
         float invSum = 0.0;
         vec3 hsv = vec3(0,0,0), rgb = vec3(0,0,0);
+        int pointCentre = -1;
         for(int i=0;i<${length};i++){
-            float invD = 1.0/dist(pointsXY[i], position);
-            hsv += invD * pointsHSV[i];
-            rgb += invD * pointsRGB[i];
-            invSum += invD;
+            float d = dist(pointsXY[i], position);
+            if(abs(d)>0.0000001){
+                float invD = 1.0/d;
+                hsv += invD * pointsHSV[i];
+                rgb += invD * pointsRGB[i];
+                invSum += invD;
+            }else{
+                pointCentre=i;
+            }
         }
-        hsv = hsv/invSum;
-        rgb = rgb/invSum;
-        hsv[0] = rgbToHue(rgb);
-        // vec3 outPut = hsv2rgb(hsv);
-        // outColor = hsvToRgb(hsv);
-        outColor = vec4(hsvToRgb(hsv),1);
-        // outColor = vec4(rgb,1);
-        // outColor = hsv;
-        // outColor = pointsRGB[0];
+        if(pointCentre == -1){
+            hsv = hsv/invSum;
+            rgb = rgb/invSum;
+            hsv[0] = rgbToHue(rgb);
+            outColor = vec4(hsvToRgb(hsv),1);
+        }else{
+            hsv = pointsHSV[pointCentre];
+            rgb = pointsRGB[pointCentre];
+            outColor = vec4(rgb, 1);
+        }
     }
 
     `;
