@@ -205,8 +205,7 @@ const renderGradient = (points, canvas) => {
         var offset = 0;
         var count = positions.length / size;
         gl.drawArrays(primType, offset, count);
-
-        return true;
+        requestAnimationFrame(renderGradient);
 
         // simply reading the data
         // var results = new Uint8Array(canvas.width * canvas.height * 4);

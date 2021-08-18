@@ -44,10 +44,12 @@ const Canvas = ({ id, canvasPoints }) => {
                 }
             };
         } else {
-            var t0 = Date.now();
-            renderGradient(points, canvas.current);
-            var t1 = Date.now() - t0;
-            console.log("GPU drawing time " + t1 + "ms");
+            // var t0 = Date.now();
+            window.requestAnimationFrame(() =>
+                renderGradient(points, canvas.current)
+            );
+            // var t1 = Date.now() - t0;
+            // console.log("GPU drawing time " + t1 + "ms");
         }
     };
     useEffect(() => {

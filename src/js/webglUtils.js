@@ -293,7 +293,7 @@ function createProgramFromSources(
             )
         );
     }
-    console.log({ shaderSources, shaders });
+    // console.log({ shaderSources, shaders });
     return createProgram(
         gl,
         shaders,
