@@ -56,7 +56,7 @@ const Canvas = ({ id, canvasPoints }) => {
         setPoints(canvasPoints);
         shootPixel();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canvasPoints]);
+    });
     useEffect(() => {
         if (!canvas.current.getContext("webgl2")) {
             alert(
