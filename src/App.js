@@ -100,7 +100,6 @@ function App() {
         else return points;
     };
     const [canvasPoints, setCanvasPoints] = useState(false);
-
     const addDragItem = () => {
         var currentXY = { x: 50, y: 50 },
             colour;

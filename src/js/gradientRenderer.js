@@ -2,7 +2,6 @@
 import createProgramFromSources, {
     resizeCanvasToDisplaySize,
 } from "../js/webglUtils";
-
 // vertex shader function that is just a function to accompany the fragment shader
 const getVertexShader = () => {
     const vs = `#version 300 es
@@ -19,7 +18,6 @@ const getVertexShader = () => {
     `;
     return vs;
 };
-
 // fragment shader function that returns FS with the number of points embedded in the source (length)
 const getFragmentShader = (length) => {
     const fs = `#version 300 es
@@ -109,7 +107,6 @@ const getFragmentShader = (length) => {
     `;
     return fs;
 };
-
 const renderGradient = (points, canvas) => {
     if (points && points.length > 0) {
         // accessing WebGL2 context from canvas
