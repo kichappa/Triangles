@@ -162,7 +162,7 @@ function App() {
                     index = i;
                 }
             }
-            console.log("dragStart " + index, dragIs[index]);
+            // console.log("dragStart " + index, dragIs[index]);
             let clientXY = { x: 0, y: 0 };
             if (e.type.substr(0, 5) === "touch") {
                 clientXY = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -270,7 +270,7 @@ function App() {
                 dragIs[index].containerRef.current.style.zIndex = 1;
             }
 
-            console.log("dragEnd " + index, dragIs[index]);
+            // console.log("dragEnd " + index, dragIs[index]);
             setDragIs([...dragIs]);
         }
     };

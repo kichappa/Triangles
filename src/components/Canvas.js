@@ -15,6 +15,7 @@ const Canvas = ({ id, canvasPoints }) => {
         // canvas.current.width = canvas.current.offsetWidth;
         // canvas.current.height = canvas.current.offsetHeight;
         if (!canvas.current.getContext("webgl2")) {
+            console.log("WebGL2 not available, using CPU.");
             var ctx = canvas.current.getContext("2d");
             const imageData = ctx.createImageData(
                 canvas.current.width,
