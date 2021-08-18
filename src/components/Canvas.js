@@ -5,15 +5,15 @@ var worker = new window.Worker("./gradientWorker.js");
 
 const Canvas = ({ id, canvasPoints }) => {
     const [points, setPoints] = useState(canvasPoints);
-    const [canvas, setCanvas] = useState(useRef(null));
+    const [canvas] = useState(useRef(null));
     const draw = (imageData) => {
         var ctx = canvas.current.getContext("2d");
         ctx.putImageData(imageData, 0, 0);
         window.requestAnimationFrame(() => draw(imageData));
     };
     const shootPixel = () => {
-        canvas.current.width = canvas.current.offsetWidth;
-        canvas.current.height = canvas.current.offsetHeight;
+        // canvas.current.width = canvas.current.offsetWidth;
+        // canvas.current.height = canvas.current.offsetHeight;
         if (!canvas.current.getContext("webgl2")) {
             var ctx = canvas.current.getContext("2d");
             const imageData = ctx.createImageData(
@@ -55,13 +55,15 @@ const Canvas = ({ id, canvasPoints }) => {
     useEffect(() => {
         setPoints(canvasPoints);
         shootPixel();
-    });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [canvasPoints]);
     useEffect(() => {
         if (!canvas.current.getContext("webgl2")) {
             alert(
                 "WebGL not available in this browser/platform. Renders may be slower."
             );
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return <canvas id={id} ref={canvas} />;
 };

@@ -18,11 +18,11 @@ function App() {
     ]);
     const rgbToHslHsvHex = (rgb) => {
         var rgbArr = [rgb.r, rgb.g, rgb.b];
-        var M, m, C, hue, I, V, L, Sv, Sl;
+        var M, m, C, hue, V, L, Sv, Sl;
         M = Math.max(...rgbArr);
         m = Math.min(...rgbArr);
         C = M - m;
-        I = (rgbArr[0] + rgbArr[1] + rgbArr[2]) / 3;
+        // I = (rgbArr[0] + rgbArr[1] + rgbArr[2]) / 3;
         // Hue
         if (C === 0) hue = 0;
         else if (M === rgbArr[0]) hue = ((rgbArr[1] - rgbArr[2]) / C) % 6;
@@ -97,7 +97,7 @@ function App() {
             }
         }
         if (set) setCanvasPoints(points);
-        return points;
+        else return points;
     };
     const [canvasPoints, setCanvasPoints] = useState(false);
 
@@ -200,7 +200,7 @@ function App() {
                 clientXY = { x: e.clientX, y: e.clientY };
             }
             mouseBound.end = clientXY;
-            var target = document.elementFromPoint(clientXY.x, clientXY.y);
+            // var target = document.elementFromPoint(clientXY.x, clientXY.y);
             setMouseBound(mouseBound);
             if (!isClick(mouseBound.start, mouseBound.end)) {
                 onPicker(dragIs[index], false);
@@ -329,6 +329,7 @@ function App() {
     };
     useEffect(() => {
         getCanvasPoints(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dragIs]);
 
     return (

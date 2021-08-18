@@ -202,7 +202,7 @@ const renderGradient = (points, canvas) => {
 
         // drawwwww
         var primType = gl.TRIANGLES;
-        var offset = 0;
+        offset = 0;
         var count = positions.length / size;
         gl.drawArrays(primType, offset, count);
         requestAnimationFrame(renderGradient);

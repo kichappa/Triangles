@@ -1,6 +1,6 @@
 import React from "react";
 import reactCSS from "reactcss";
-import { useRef, useEffect, useState } from "react";
+import { useRef } from "react";
 import { SketchPicker } from "react-color";
 
 const Point = ({ points, onChangeColor, index }) => {
