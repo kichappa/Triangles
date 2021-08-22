@@ -84,7 +84,7 @@ const getFragmentShader = (length) => {
         for(int i=0;i<${length};i++){
             float d = dist(pointsXY[i], position);
             if(abs(d)>0.0000001){
-                float invD = 1.0/d;
+                float invD = 1.0*pow(float(i+1), 1.0)/d;
                 hsv += invD * pointsHSV[i];
                 rgb += invD * pointsRGB[i];
                 invSum += invD;
