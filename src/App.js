@@ -10,6 +10,10 @@ function App() {
                 x: 0,
                 y: 0,
             },
+            middle: {
+                x: 0,
+                y: 0,
+            },
             end: {
                 x: 0,
                 y: 0,
@@ -68,6 +72,11 @@ function App() {
             pointRef: null,
             containerRef: null,
             active: false,
+            showActive: false,
+            radius: 1.0,
+            oldRadius: undefined,
+            resizing: false,
+            clicked: false,
             colour: defaultColour,
             showPicker: false,
             pointerOffset: { x: 0, y: 0 },
@@ -131,6 +140,11 @@ function App() {
             ref: null,
             containerRef: null,
             active: false,
+            showActive: false,
+            clicked: false,
+            radius: 1 + Math.random * 2,
+            oldRadius: undefined,
+            resizing: false,
             colour: colour,
             showPicker: false,
             pointerOffset: { x: 0, y: 0 },
@@ -152,37 +166,59 @@ function App() {
     const dragStart = (e) => {
         // mouseDown is to capture off location drags that go over inactive point
         mouseBound.mouseDown = true;
-        setMouseBound(mouseBound);
+
+        let clientXY = { x: 0, y: 0 };
+        if (e.type.substr(0, 5) === "touch") {
+            clientXY = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        } else {
+            clientXY = { x: e.clientX, y: e.clientY };
+        }
+        mouseBound.start = clientXY;
+        mouseBound.end = clientXY;
         // capturing target since touch and mouse output different e.target
         var target = document.elementFromPoint(e.clientX, e.clientY);
-        if (target.classList.contains("dragItem")) {
+        // console.log("target is", target);
+        // console.log("whosClicked", whosClicked());
+        if (
+            target.classList.contains("dragItem") &&
+            (!isAnyClicked() || (isAnyClicked() && whosClicked() !== target))
+        ) {
+            // if (target.classList.contains("dragItem")) {
+            closeAllClicked();
             var index;
             for (let i in dragIs) {
                 if (dragIs[i].pointRef.current === target) {
                     index = i;
                 }
             }
-            // console.log("dragStart " + index, dragIs[index]);
-            let clientXY = { x: 0, y: 0 };
-            if (e.type.substr(0, 5) === "touch") {
-                clientXY = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            } else {
-                clientXY = { x: e.clientX, y: e.clientY };
-            }
-            mouseBound.start = clientXY;
-            mouseBound.end = clientXY;
-            setMouseBound(mouseBound);
             dragIs[index].pointerOffset.x =
-                clientXY.x - dragIs[index].currentXY.x;
+                mouseBound.start.x - dragIs[index].currentXY.x;
             dragIs[index].pointerOffset.y =
-                clientXY.y - dragIs[index].currentXY.y;
+                mouseBound.start.y - dragIs[index].currentXY.y;
             dragIs[index].active = true;
-            dragIs[index].pointRef.current.classList.add("active");
-            dragIs[index].containerRef.current.style.zIndex = 1;
+            dragIs[index].containerRef.current.style.zIndex = 2;
             setDragIs([...dragIs]);
+            // console.log("1Show active", dragIs[index].showPicker);
+        } else if (
+            isAnyClicked() &&
+            (whosClicked("full")[0] === target ||
+                whosClicked("full")[1] === target)
+        ) {
+            let index = whosClicked("index");
+            dragIs[index].resizing = true;
         }
+        setMouseBound(mouseBound);
     };
     const drag = (e) => {
+        var target = document.elementFromPoint(e.clientX, e.clientY);
+        if (e.type.substr(0, 5) === "touch") {
+            mouseBound.middle = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY,
+            };
+        } else {
+            mouseBound.middle = { x: e.clientX, y: e.clientY };
+        }
         if (isAnyActive()) {
             var index;
             for (let i in dragIs) {
@@ -190,23 +226,22 @@ function App() {
                     index = i;
                 }
             }
+            // console.log("2Show active", dragIs[index].showPicker);
             e.preventDefault();
             // Calculating current XY
-            let clientXY = { x: 0, y: 0 };
-            if (e.type.substr(0, 5) === "touch") {
-                clientXY = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            } else {
-                clientXY = { x: e.clientX, y: e.clientY };
-            }
-            mouseBound.end = clientXY;
-            // var target = document.elementFromPoint(clientXY.x, clientXY.y);
-            setMouseBound(mouseBound);
+
+            mouseBound.end = mouseBound.middle;
+            // console.log("3Show active", dragIs[index].showPicker);
             if (!isClick(mouseBound.start, mouseBound.end)) {
-                onPicker(dragIs[index], false);
+                // console.log("hello not a click");
+                onPointClick(index, false);
                 closePickers(index);
+                dragIs[index].containerRef.current.style.zIndex = 2;
                 var currentXY = { x: 0, y: 0 };
-                currentXY.x = clientXY.x - dragIs[index].pointerOffset.x;
-                currentXY.y = clientXY.y - dragIs[index].pointerOffset.y;
+                currentXY.x =
+                    mouseBound.middle.x - dragIs[index].pointerOffset.x;
+                currentXY.y =
+                    mouseBound.middle.y - dragIs[index].pointerOffset.y;
                 let boundXY = [
                     [0, 0],
                     [0, 0],
@@ -229,10 +264,19 @@ function App() {
                     Math.min(currentXY.y, boundXY[1][1]),
                     boundXY[0][1]
                 );
-
+                dragIs[index].showActive = true;
                 setDragIs([...dragIs]);
             }
-        } else if (mouseBound.mouseDown) {
+        } else if (whosClicked() && dragIs[whosClicked("index")].resizing) {
+            let radiusInc = dist(mouseBound.start, mouseBound.middle);
+            console.log({ radiusInc });
+            let index = whosClicked("index");
+            dragIs[index].radius = dragIs[index].oldRadius + radiusInc;
+            setDragIs([...dragIs]);
+        } else if (
+            mouseBound.mouseDown &&
+            (!isAnyClicked() || (isAnyClicked() && whosClicked() !== target))
+        ) {
             dragStart(e);
         } else {
             // var target = document.elementFromPoint(e.clientX, e.clientY);
@@ -246,42 +290,57 @@ function App() {
             //         );
             // } catch {}
         }
+        setMouseBound(mouseBound);
     };
     const dragEnd = (e) => {
         mouseBound.mouseDown = false;
-        setMouseBound(mouseBound);
         var index;
-        for (let i in dragIs) if (dragIs[i].active) index = i;
+        for (let i in dragIs)
+            if (dragIs[i].active || dragIs[i].clicked) index = i;
         if (index) {
             dragIs[index].pointerOffset.x = dragIs[index].currentXY.x;
             dragIs[index].pointerOffset.y = dragIs[index].currentXY.y;
             dragIs[index].active = false;
+            var target = document.elementFromPoint(e.clientX, e.clientY);
+            // console.log("target was ", target.classList);
             if (
                 isClick(mouseBound.start, mouseBound.end) &&
-                !dragIs[index].showPicker
+                (target.classList.contains("dragItem") ||
+                    target.classList.contains("dragIWeight"))
             ) {
                 closePickers(index);
-                dragIs[index].pointRef.current.classList.add("active");
-                dragIs[index].containerRef.current.style.zIndex = 2;
-                onPicker(dragIs[index], true);
+                dragIs[index].containerRef.current.style.zIndex = dragIs[index]
+                    .clicked
+                    ? 1
+                    : 2;
+                onPointClick(index, !dragIs[index].clicked);
+                dragIs[index].active = false;
+            } else if (dragIs[index].resizing) {
+                dragIs[index].resizing = false;
+                dragIs[index].oldRadius = dragIs[index].radius;
             } else {
-                dragIs[index].pointRef.current.classList.remove("active");
-                onPicker(dragIs[index], false);
+                dragIs[index].showActive = false;
                 dragIs[index].containerRef.current.style.zIndex = 1;
             }
-
-            // console.log("dragEnd " + index, dragIs[index]);
             setDragIs([...dragIs]);
         }
+        setMouseBound(mouseBound);
+    };
+    const closeAllClicked = (index) => {
+        for (let i in dragIs) {
+            dragIs[i].showPicker = false;
+            dragIs[i].clicked = false;
+            dragIs[i].containerRef.current.style.zIndex = 1;
+        }
+        setDragIs(dragIs);
     };
     const closePickers = (index) => {
         for (let i in dragIs) {
-            dragIs[i].showPicker = false;
-            dragIs[i].pointRef.current.classList.remove("active");
-            dragIs[i].containerRef.current.style.zIndex = 1;
+            if (i !== index) {
+                dragIs[i].showPicker = false;
+                dragIs[i].containerRef.current.style.zIndex = 1;
+            }
         }
-        dragIs[index].pointRef.current.classList.add("active");
-        dragIs[index].pointRef.current.parentNode.style.zIndex = 2;
         setDragIs(dragIs);
     };
     const isAnyActive = () => {
@@ -291,6 +350,27 @@ function App() {
         }
         return active;
     };
+    const isAnyClicked = () => {
+        let clicked = false;
+        for (let i in dragIs) {
+            clicked = clicked || dragIs[i].clicked;
+        }
+        return clicked;
+    };
+    const whosClicked = (returnType = "DOM") => {
+        let clicked = -1;
+        for (let i in dragIs) {
+            if (dragIs[i].clicked) clicked = i;
+        }
+        // console.log(clicked);
+        if (clicked !== -1) {
+            if (returnType === "DOM") return dragIs[clicked].pointRef.current;
+            else if (returnType === "index") return clicked;
+            else if (returnType === "full") {
+                return dragIs[clicked].pointRef.current.parentNode.children;
+            }
+        } else return undefined;
+    };
     const isPickerActive = () => {
         let showPicker = false;
         for (let i in dragIs) {
@@ -298,14 +378,18 @@ function App() {
         }
         return showPicker;
     };
-    const onPicker = (point, state) => {
-        point.showPicker = state;
+    const onPointClick = (index, state) => {
+        dragIs[index].clicked = state;
+        dragIs[index].oldRadius = dragIs[index].radius;
+        // dragIs[index].showPicker = state;
+        setDragIs(dragIs);
+    };
+    const dist = (p1, p2) => {
+        return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
     };
     const isClick = (startXY, endXY) => {
         let tol = 5;
-        let value = Math.sqrt(
-            Math.pow(endXY.x - startXY.x, 2) + Math.pow(endXY.y - startXY.y, 2)
-        );
+        let value = dist(endXY, startXY);
         return value <= tol;
     };
     const initSizes = () => {

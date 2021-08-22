@@ -11,32 +11,50 @@
 }
 
 .dragItem {
+    box-sizing: border-box;
     z-index: 1;
     touch-action: none;
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
     border: 3px solid #ffffff;
     border-radius: 50%;
     touch-action: none;
     user-select: none;
     transition: all 0.2s cubic-bezier(0.39, 0.58, 0.57, 1);
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
+.dragIWeight {
+    box-sizing: border-box;
+    z-index: 1;
+    touch-action: none;
+    /* width: 40px; */
+    /* height: 40px; */
+    background-color: #ffffff80;
+    border-radius: 50%;
+    touch-action: none;
+    user-select: none;
+    transition: all 0.3s cubic-bezier(0.39, 0.58, 0.57, 1);
+    position: absolute;
+    transform: translate(-50%, -50%);
 }
 
 @media (hover: hover) and (pointer: fine) {
-    .dragItem:hover,
-    .dragItem:active,
-    .dragItem.active {
+    .dragItem:hover {
+        width: 35px;
+        height: 35px;
         cursor: pointer;
         border-width: 8px;
     }
 }
 
-@media (hover: none) and (pointer: coarse) {
-    .dragItem:active,
-    .dragItem:focus,
-    .dragItem.active {
-        border-width: 8px;
-    }
+.dragItem.active {
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    border-width: 8px;
+    box-shadow: 0px 0px 4px rgba(53, 53, 53, 0.5);
 }
 
 .dragIContainer {
