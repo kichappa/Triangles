@@ -96,5 +96,5 @@
 }
 
 .dragIContainer .sketch-picker {
-    transform: translate(calc(-50% + 18px), 2px);
+    transform: translate(calc(-50% + 18px), +10px);
 }

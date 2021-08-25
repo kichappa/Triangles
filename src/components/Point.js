@@ -52,10 +52,10 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                 fontSize: 30 / 2.5 + "pt",
                 transform: points[index].tags?.clicked
                     ? points[index].tags?.showRadius
-                        ? `translate(-50%, calc(-150% - ${
+                        ? `translate(-50%, calc(-60px - ${
                               points[index].radius + 25
                           }px))`
-                        : `translate(-50%, -200%)`
+                        : `translate(-50%, -60px)`
                     : "translate(-50%, -50%)",
                 transition: points[index].tags?.resizing
                     ? "all 0s cubic-bezier(0.39, 0.58, 0.57, 1)"
