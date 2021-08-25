@@ -27,6 +27,7 @@ const getFragmentShader = (length) => {
 
     uniform vec2 u_resolution;
     uniform ivec2 pointsXY[${length}];
+    uniform float pointsRadius[${length}];
     uniform vec3 pointsRGB[${length}];
     uniform vec3 pointsHSV[${length}];
 
@@ -84,7 +85,11 @@ const getFragmentShader = (length) => {
         for(int i=0;i<${length};i++){
             float d = dist(pointsXY[i], position);
             if(abs(d)>0.0000001){
-                float invD = 1.0*pow(float(i+1), 1.0)/d;
+                // float invD = 1.0*pow(float(i+1), 1.0)/d;
+                // float invD = (1.0+pointsRadius[i]/10.0)/d;
+                float invD = (1.0+pointsRadius[i]/10.0)/d;
+                // invD = invD* (1.0+pointsRadius[i]/10.0);
+                // invD = pow(1.0/d, (1.0+pointsRadius[i]/10.0));
                 hsv += invD * pointsHSV[i];
                 rgb += invD * pointsRGB[i];
                 invSum += invD;
@@ -126,6 +131,7 @@ const renderGradient = (points, canvas) => {
         const locations = {
             position: gl.getAttribLocation(program, "a_position"),
             resolution: gl.getUniformLocation(program, "u_resolution"),
+            pointsRadius: gl.getUniformLocation(program, "pointsRadius"),
             pointsXY: gl.getUniformLocation(program, "pointsXY"),
             pointsRGB: gl.getUniformLocation(program, "pointsRGB"),
             pointsHSV: gl.getUniformLocation(program, "pointsHSV"),
@@ -182,6 +188,10 @@ const renderGradient = (points, canvas) => {
         gl.useProgram(program);
 
         // generating arrays that will be sent to uniforms
+        const pointsRadius = points.map(({ radius }) => {
+            return radius;
+        });
+        // console.log(pointsRadius.flat());
         const pointsXY = points.map(({ x, y }) => {
             return [x, y];
         });
@@ -192,6 +202,7 @@ const renderGradient = (points, canvas) => {
             return [colour.hsv.h / 360, colour.hsv.s, colour.hsv.v];
         });
         // setting uniforms
+        gl.uniform1fv(locations.pointsRadius, pointsRadius.flat());
         gl.uniform2iv(locations.pointsXY, pointsXY.flat());
         gl.uniform3fv(locations.pointsRGB, pointsRGB.flat());
         gl.uniform3fv(locations.pointsHSV, pointsHSV.flat());
@@ -202,7 +213,7 @@ const renderGradient = (points, canvas) => {
         offset = 0;
         var count = positions.length / size;
         gl.drawArrays(primType, offset, count);
-        requestAnimationFrame(renderGradient);
+        // requestAnimationFrame(renderGradient);
 
         // simply reading the data
         // var results = new Uint8Array(canvas.width * canvas.height * 4);

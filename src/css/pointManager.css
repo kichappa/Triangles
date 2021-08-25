@@ -70,10 +70,10 @@
     }
 }
 
-#point-manager .plus:before {
+/* #point-manager .plus:before {
     content: "\FF0B";
-}
+} */
 
-#point-manager .minus::before {
+/* #point-manager .minus::before {
     content: "\2212";
-}
+} */

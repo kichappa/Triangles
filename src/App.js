@@ -1,11 +1,31 @@
 import { useState, useEffect } from "react";
 import Points from "./components/Points";
 import Canvas from "./components/Canvas";
+import { FaPlus, FaMinus } from "react-icons/fa";
 
 function App() {
-    const [mouseBound, setMouseBound] = useState([
-        {
-            mouseDown: false,
+    const [mouse, setMouse] = useState({
+        down: false,
+        clicked: {
+            status: false,
+            index: undefined,
+            obj: undefined,
+        },
+        active: false,
+        resizing: {
+            mode: false,
+            start: false,
+        },
+        target: {
+            obj: undefined,
+            index: undefined,
+            initialPosition: {
+                x: 0,
+                y: 0,
+            },
+            initialRadius: undefined,
+        },
+        pos: {
             start: {
                 x: 0,
                 y: 0,
@@ -19,7 +39,7 @@ function App() {
                 y: 0,
             },
         },
-    ]);
+    });
     const rgbToHslHsvHex = (rgb) => {
         var rgbArr = [rgb.r, rgb.g, rgb.b];
         var M, m, C, hue, V, L, Sv, Sl;
@@ -71,17 +91,12 @@ function App() {
             // After a drag event, all [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0); again.
             pointRef: null,
             containerRef: null,
-            active: false,
-            showActive: false,
-            radius: 1.0,
-            oldRadius: undefined,
-            resizing: false,
-            clicked: false,
+            radius: 0,
             colour: defaultColour,
             showPicker: false,
-            pointerOffset: { x: 0, y: 0 },
             currentXY: { x: 50, y: 50 },
-            size: false,
+            size: undefined,
+            containerSize: undefined,
         },
     ]);
     const hsvRgbObjToArr = (obj) => {
@@ -102,6 +117,7 @@ function App() {
                     y: dragIs[i].currentXY.y + dragIs[i].size[1] / 2,
                     colour: dragIs[i].colour,
                     colourArr: hsvRgbObjToArr(dragIs[i].colour),
+                    radius: dragIs[i].radius,
                 };
             }
         }
@@ -139,17 +155,13 @@ function App() {
         const newDragItem = {
             ref: null,
             containerRef: null,
-            active: false,
-            showActive: false,
-            clicked: false,
-            radius: 1 + Math.random * 2,
-            oldRadius: undefined,
-            resizing: false,
+            radius: 0, //1 + Math.random() * 2,
             colour: colour,
             showPicker: false,
             pointerOffset: { x: 0, y: 0 },
             currentXY: currentXY,
-            size: false,
+            size: undefined,
+            containerSize: undefined,
         };
         setDragIs([...dragIs, newDragItem]);
     };
@@ -164,172 +176,284 @@ function App() {
         console.log("New points are ", dragIs);
     };
     const dragStart = (e) => {
-        // mouseDown is to capture off location drags that go over inactive point
-        mouseBound.mouseDown = true;
-
-        let clientXY = { x: 0, y: 0 };
+        // console.log("Hi start");
+        // setting mouse elements at pointerDown
+        mouse.down = true;
         if (e.type.substr(0, 5) === "touch") {
-            clientXY = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        } else {
-            clientXY = { x: e.clientX, y: e.clientY };
-        }
-        mouseBound.start = clientXY;
-        mouseBound.end = clientXY;
-        // capturing target since touch and mouse output different e.target
-        var target = document.elementFromPoint(e.clientX, e.clientY);
-        // console.log("target is", target);
-        // console.log("whosClicked", whosClicked());
-        if (
-            target.classList.contains("dragItem") &&
-            (!isAnyClicked() || (isAnyClicked() && whosClicked() !== target))
-        ) {
-            // if (target.classList.contains("dragItem")) {
-            closeAllClicked();
-            var index;
-            for (let i in dragIs) {
-                if (dragIs[i].pointRef.current === target) {
-                    index = i;
-                }
-            }
-            dragIs[index].pointerOffset.x =
-                mouseBound.start.x - dragIs[index].currentXY.x;
-            dragIs[index].pointerOffset.y =
-                mouseBound.start.y - dragIs[index].currentXY.y;
-            dragIs[index].active = true;
-            dragIs[index].containerRef.current.style.zIndex = 2;
-            setDragIs([...dragIs]);
-            // console.log("1Show active", dragIs[index].showPicker);
-        } else if (
-            isAnyClicked() &&
-            (whosClicked("full")[0] === target ||
-                whosClicked("full")[1] === target)
-        ) {
-            let index = whosClicked("index");
-            dragIs[index].resizing = true;
-        }
-        setMouseBound(mouseBound);
-    };
-    const drag = (e) => {
-        var target = document.elementFromPoint(e.clientX, e.clientY);
-        if (e.type.substr(0, 5) === "touch") {
-            mouseBound.middle = {
+            mouse.pos.start = {
                 x: e.touches[0].clientX,
                 y: e.touches[0].clientY,
             };
         } else {
-            mouseBound.middle = { x: e.clientX, y: e.clientY };
+            mouse.pos.start = { x: e.clientX, y: e.clientY };
         }
-        if (isAnyActive()) {
-            var index;
-            for (let i in dragIs) {
-                if (dragIs[i].active) {
-                    index = i;
-                }
-            }
-            // console.log("2Show active", dragIs[index].showPicker);
-            e.preventDefault();
-            // Calculating current XY
+        mouse.pos.end = mouse.pos.start; // not sure if this is needed.
 
-            mouseBound.end = mouseBound.middle;
-            // console.log("3Show active", dragIs[index].showPicker);
-            if (!isClick(mouseBound.start, mouseBound.end)) {
-                // console.log("hello not a click");
-                onPointClick(index, false);
-                closePickers(index);
-                dragIs[index].containerRef.current.style.zIndex = 2;
-                var currentXY = { x: 0, y: 0 };
-                currentXY.x =
-                    mouseBound.middle.x - dragIs[index].pointerOffset.x;
-                currentXY.y =
-                    mouseBound.middle.y - dragIs[index].pointerOffset.y;
-                let boundXY = [
-                    [0, 0],
-                    [0, 0],
-                ];
-                boundXY[1] = [
-                    boundXY[0][0] +
-                        dragIs[index].containerRef.current.parentNode
-                            .clientWidth -
-                        dragIs[index].size[0],
-                    boundXY[0][1] +
-                        dragIs[index].containerRef.current.parentNode
-                            .clientHeight -
-                        dragIs[index].size[1],
-                ];
-                dragIs[index].currentXY.x = Math.max(
-                    Math.min(currentXY.x, boundXY[1][0]),
-                    boundXY[0][0]
-                );
-                dragIs[index].currentXY.y = Math.max(
-                    Math.min(currentXY.y, boundXY[1][1]),
-                    boundXY[0][1]
-                );
-                dragIs[index].showActive = true;
-                setDragIs([...dragIs]);
-            }
-        } else if (whosClicked() && dragIs[whosClicked("index")].resizing) {
-            let radiusInc = dist(mouseBound.start, mouseBound.middle);
-            console.log({ radiusInc });
-            let index = whosClicked("index");
-            dragIs[index].radius = dragIs[index].oldRadius + radiusInc;
-            setDragIs([...dragIs]);
-        } else if (
-            mouseBound.mouseDown &&
-            (!isAnyClicked() || (isAnyClicked() && whosClicked() !== target))
+        mouse.target.obj = document.elementFromPoint(e.clientX, e.clientY);
+        var index = getIndex(mouse.target.obj);
+        mouse.target.index = index;
+        // console.log("target is", mouse.target.obj);
+        // console.log("whosClicked", whosClicked());
+        // console.log(
+        //     !mouse.clicked.status,
+        //     mouse.clicked.index,
+        //     mouse.target.index,
+        //     mouse.clicked.index !== mouse.target.index,
+        //     !mouse.clicked.status ||
+        //         (mouse.clicked.status &&
+        //             mouse.clicked.index !== mouse.target.index)
+        // );
+
+        // console.log(
+        //     mouse.clicked.status,
+        //     mouse.clicked.obj,
+        //     mouse.target.obj.parentNode.children,
+        //     mouse.clicked.status &&
+        //         (mouse.clicked.obj ===
+        //             mouse.target.obj.parentNode.children[0] ||
+        //             mouse.clicked.obj ===
+        //                 mouse.target.obj.parentNode.children[1])
+        // );
+        // moving point
+        if (
+            // if pointerdown on the a dragItem
+            mouse.target.obj.classList.contains("dragItem") &&
+            (!mouse.clicked.status || // if none is clicked,
+                (mouse.clicked.status &&
+                    mouse.clicked.index !== mouse.target.index)) // or clicked item is not pointerdown item
         ) {
-            dragStart(e);
-        } else {
-            // var target = document.elementFromPoint(e.clientX, e.clientY);
-            // // console.log(target)
-            // try {
-            //     if (target.tagName === "CANVAS")
-            //         console.log(
-            //             target
-            //                 .getContext("2d")
-            //                 .getImageData(e.clientX, e.clientY, 1, 1).data
-            //         );
-            // } catch {}
+            // console.log("entering dragStart move");
+            closePoint();
+            // console.log(mouse.target.obj);
+            // console.log(index);
+            if (index) {
+                mouse.target.index = index;
+                // console.log("Init XY", dragIs[mouse.target.index].currentXY);
+                mouse.target.init = {
+                    x:
+                        dragIs[mouse.target.index].currentXY.x -
+                        mouse.pos.start.x,
+                    y:
+                        dragIs[mouse.target.index].currentXY.y -
+                        mouse.pos.start.y,
+                };
+                mouse.active = true;
+                dragIs[mouse.target.index].tags = { active: true };
+                // change this below
+                dragIs[
+                    mouse.target.index
+                ].containerRef.current.style.zIndex = 2;
+            }
         }
-        setMouseBound(mouseBound);
+        // resizing point
+        else if (
+            // clicked item is pointerdown item
+            mouse.clicked.status &&
+            mouse.clicked.index === mouse.target.index
+        ) {
+            mouse.resizing.mode = true;
+            mouse.target.initialRadius = dragIs[mouse.clicked.index].radius;
+            console.log("hi resize");
+        }
+        setDragIs([...dragIs]);
+        setMouse(mouse);
+    };
+    const drag = (e) => {
+        // mouse.target.obj = document.elementFromPoint(e.clientX, e.clientY);
+        if (e.type.substr(0, 5) === "touch") {
+            mouse.pos.middle = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY,
+            };
+        } else {
+            mouse.pos.middle = { x: e.clientX, y: e.clientY };
+        }
+        // console.log(mouse.pos.middle);
+
+        // if an item is active and the mouse movement is not a click, drag it
+        if (mouse.active && !isClick(mouse.pos.start, mouse.pos.middle)) {
+            // see if these are needed...
+            // onPointClick(index, false);
+            // closePickers(index);
+            e.preventDefault();
+            var index = mouse.target.index;
+            dragIs[index].containerRef.current.style.zIndex = 2; // bringing item to top
+            var currentXY = { x: 0, y: 0 }; // saving the position to a variable (used to bound...)
+            currentXY.x = mouse.pos.middle.x + mouse.target.init.x;
+            currentXY.y = mouse.pos.middle.y + mouse.target.init.y;
+            // finding the bounds of the dragPalette element
+            // this is done so that the points stay inside
+            // the palette even if cursor is outside
+            let boundXY = getBounds(index);
+            dragIs[index].currentXY.x = Math.max(
+                Math.min(currentXY.x, boundXY[1][0]),
+                boundXY[0][0]
+            );
+            dragIs[index].currentXY.y = Math.max(
+                Math.min(currentXY.y, boundXY[1][1]),
+                boundXY[0][1]
+            );
+        }
+        // resizing
+        else if (mouse.resizing.mode) {
+            console.log("point is at ", pointCentre(mouse.clicked.index));
+            let r = dist(pointCentre(mouse.clicked.index), {
+                x: mouse.pos.middle.x - 20,
+                y: mouse.pos.middle.y - 20,
+            });
+            console.log(r - 25, mouse.target.initialRadius);
+            if (mouse.resizing.start) {
+                dragIs[mouse.clicked.index].radius = Math.max(
+                    Math.abs(r) - 25,
+                    0
+                );
+                console.log(Math.abs(r), dragIs[mouse.clicked.index].radius);
+            } else if (r - 25 >= mouse.target.initialRadius) {
+                dragIs[mouse.clicked.index].tags
+                    ? (dragIs[mouse.clicked.index].tags.resizing = true)
+                    : (dragIs[mouse.clicked.index].tags = { resizing: true });
+                mouse.resizing.start = true;
+            }
+        }
+        // else if (mouseBound.clicked.status && mouseBound.resizing) {
+        //     let index = mouseBound.clicked.index;
+        //     let radiusInc = dist(mouseBound.pos.start, mouseBound.pos.middle);
+        //     console.log({ radiusInc });
+        //     dragIs[index].radius = dragIs[index].oldRadius + radiusInc;
+        //     setDragIs([...dragIs]);
+        //     // } else if (whosClicked() && dragIs[whosClicked("index")].resizing) {
+        //     //     let radiusInc = dist(mouse.pos.start, mouse.pos.middle);
+        //     //     console.log({ radiusInc });
+        //     //     let index = whosClicked("index");
+        //     //     dragIs[index].radius = dragIs[index].oldRadius + radiusInc;
+        //     //     setDragIs([...dragIs]);
+        //     // } else if (
+        //     //     mouse.pos.down &&
+        //     //     (!isAnyClicked() || (isAnyClicked() && whosClicked() !== target))
+        //     // ) {
+        //     //     dragStart(e);
+        // } else {
+        //     // var target = document.elementFromPoint(e.clientX, e.clientY);
+        //     // // console.log(target)
+        //     // try {
+        //     //     if (target.tagName === "CANVAS")
+        //     //         console.log(
+        //     //             target
+        //     //                 .getContext("2d")
+        //     //                 .getImageData(e.clientX, e.clientY, 1, 1).data
+        //     //         );
+        //     // } catch {}
+        // }
+        setDragIs([...dragIs]);
+        setMouse(mouse);
     };
     const dragEnd = (e) => {
-        mouseBound.mouseDown = false;
-        var index;
-        for (let i in dragIs)
-            if (dragIs[i].active || dragIs[i].clicked) index = i;
-        if (index) {
-            dragIs[index].pointerOffset.x = dragIs[index].currentXY.x;
-            dragIs[index].pointerOffset.y = dragIs[index].currentXY.y;
-            dragIs[index].active = false;
-            var target = document.elementFromPoint(e.clientX, e.clientY);
-            // console.log("target was ", target.classList);
-            if (
-                isClick(mouseBound.start, mouseBound.end) &&
-                (target.classList.contains("dragItem") ||
-                    target.classList.contains("dragIWeight"))
-            ) {
-                closePickers(index);
-                dragIs[index].containerRef.current.style.zIndex = dragIs[index]
-                    .clicked
-                    ? 1
-                    : 2;
-                onPointClick(index, !dragIs[index].clicked);
-                dragIs[index].active = false;
-            } else if (dragIs[index].resizing) {
-                dragIs[index].resizing = false;
-                dragIs[index].oldRadius = dragIs[index].radius;
-            } else {
-                dragIs[index].showActive = false;
-                dragIs[index].containerRef.current.style.zIndex = 1;
-            }
-            setDragIs([...dragIs]);
+        if (e.type.substr(0, 5) === "touch") {
+            mouse.pos.end = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY,
+            };
+        } else {
+            mouse.pos.end = { x: e.clientX, y: e.clientY };
         }
-        setMouseBound(mouseBound);
+        let index = mouse.target.index;
+        // console.log(JSON.parse(JSON.stringify(mouse.active)));
+        let target = document.elementFromPoint(e.clientX, e.clientY);
+        // item is clicked, show radius
+        if (
+            isClick(mouse.pos.start, mouse.pos.end) &&
+            (target.classList.contains("dragItem") ||
+                target.classList.contains("dragIWeight"))
+        ) {
+            console.log("Hello click");
+            dragIs[index].containerRef.current.style.zIndex = dragIs[index]
+                .clicked
+                ? 1
+                : 2;
+            // console.log("clicked", mouse.clicked.status);
+            // console.log(!mouse.clicked.status);
+            if (
+                !mouse.clicked.status ||
+                (mouse.clicked.target && mouse.clicked.target !== target)
+            ) {
+                // console.log("clicking", target);
+                mouse.clicked.status = true;
+                mouse.clicked.target = target;
+                mouse.clicked.index = getIndex(target);
+                closePoint(mouse.clicked.index);
+                dragIs[mouse.clicked.index].tags = {
+                    clicked: true,
+                    showRadius: true,
+                };
+            } else if (
+                mouse.clicked.target &&
+                mouse.clicked.target === target
+            ) {
+                // console.log("unclicking");
+                mouse.clicked.status = false;
+                closePoint();
+                mouse.clicked.target = undefined;
+                mouse.clicked.index = undefined;
+            }
+            // onPointClick(index, !dragIs[index].clicked);
+        } else if (mouse.resizing.start) {
+            console.log("hello resize");
+            delete dragIs[index].tags.resizing;
+            // dragIs[index].oldRadius = dragIs[index].radius;
+        } else if (mouse.active) {
+            console.log("hello active fello, go to sleep");
+            closePoint();
+            mouse.active = false;
+            dragIs[index].containerRef.current.style.zIndex = 1;
+        }
+        mouse.pos.down = false;
+        mouse.active = false;
+        mouse.resizing.mode = false;
+        mouse.resizing.start = false;
+        setDragIs([...dragIs]);
+        setMouse(mouse);
+        // console.log("after clicked", mouse.clicked.status);
     };
-    const closeAllClicked = (index) => {
+    const getIndex = (obj) => {
         for (let i in dragIs) {
-            dragIs[i].showPicker = false;
-            dragIs[i].clicked = false;
+            if (dragIs[i].pointRef.current === obj) {
+                return i;
+            }
+        }
+        return undefined;
+    };
+    const pointCentre = (index) => {
+        let centre = {
+            x: dragIs[index].currentXY.x + dragIs[index].containerSize[0] / 2,
+            y: dragIs[index].currentXY.y + dragIs[index].containerSize[1] / 2,
+        };
+        return centre;
+    };
+    const getBounds = (index) => {
+        let boundXY = [
+            [
+                -(dragIs[index].containerSize[0] - dragIs[index].size[0]) / 2,
+                -(dragIs[index].containerSize[1] - dragIs[index].size[1]) / 2,
+            ], // min X, Y
+            [0, 0], // max X, Y
+        ];
+        boundXY[1] = [
+            boundXY[0][0] +
+                dragIs[index].containerRef.current.parentNode.clientWidth -
+                dragIs[index].size[0], // (- size) because anchor is at top left
+            boundXY[0][1] +
+                dragIs[index].containerRef.current.parentNode.clientHeight -
+                dragIs[index].size[1],
+        ];
+        return boundXY;
+    };
+    const closePoint = (index = undefined) => {
+        !index && (mouse.clicked.status = false);
+        for (let i in dragIs) {
+            if (index === i) {
+                continue;
+            }
+            if (dragIs[i].tags) delete dragIs[i].tags;
             dragIs[i].containerRef.current.style.zIndex = 1;
         }
         setDragIs(dragIs);
@@ -392,7 +516,7 @@ function App() {
         let value = dist(endXY, startXY);
         return value <= tol;
     };
-    const initSizes = () => {
+    const updateSizes = () => {
         let update = false;
         for (let i in dragIs) {
             if (!dragIs[i].size) {
@@ -400,6 +524,12 @@ function App() {
                 dragIs[i].size = [
                     dragIs[i].pointRef.current.offsetWidth,
                     dragIs[i].pointRef.current.offsetHeight,
+                ];
+                dragIs[i].containerSize = [
+                    dragIs[i].pointRef.current.parentNode.parentNode
+                        .offsetWidth,
+                    dragIs[i].pointRef.current.parentNode.parentNode
+                        .offsetHeight,
                 ];
             }
         }
@@ -410,11 +540,31 @@ function App() {
         newDragIs[index].colour = color;
         setDragIs([...newDragIs]);
     };
+    const onPickerButton = (index) => {
+        if (dragIs[index].tags) {
+            if (dragIs[index].tags.showPicker) {
+                delete dragIs[index].tags.showPicker;
+                dragIs[index].tags.showRadius = true;
+            } else {
+                dragIs[index].tags.showPicker = true;
+                delete dragIs[index].tags.showRadius;
+            }
+        } else dragIs[index].tags = { showPicker: true };
+        setDragIs([...dragIs]);
+    };
     useEffect(() => {
         getCanvasPoints(true);
+        // console.log(
+        //     dragIs[0]?.pointRef.current.offsetWidth,
+        //     dragIs[0]?.pointRef.current.offsetHeight,
+        //     dragIs[0]?.pointRef.current.parentNode.parentNode.offsetWidth,
+        //     dragIs[0]?.pointRef.current.parentNode.parentNode.offsetHeight
+        // );
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dragIs]);
-
+    useEffect(() => {
+        console.log("tT", mouse);
+    }, []);
     return (
         <div
             className="App"
@@ -431,18 +581,20 @@ function App() {
                 </div>
                 <Points
                     points={dragIs}
-                    onRender={initSizes}
+                    onRender={updateSizes}
                     onChangeColor={onChangeColor}
+                    onPickerButton={onPickerButton}
                 />
                 <div id="point-manager">
-                    <button
-                        className="button plus"
-                        onClick={addDragItem}
-                    ></button>
+                    <button className="button plus" onClick={addDragItem}>
+                        <FaPlus />
+                    </button>
                     <button
                         className="button minus"
                         onClick={() => removeDragItem({ index: -1 })}
-                    ></button>
+                    >
+                        <FaMinus />
+                    </button>
                 </div>
             </div>
         </div>
