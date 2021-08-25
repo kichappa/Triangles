@@ -11,6 +11,7 @@ function App() {
             index: undefined,
             obj: undefined,
         },
+        showRadius: false,
         active: false,
         resizing: {
             mode: false,
@@ -220,7 +221,8 @@ function App() {
             mouse.target.obj.classList.contains("dragItem") &&
             (!mouse.clicked.status || // if none is clicked,
                 (mouse.clicked.status &&
-                    mouse.clicked.index !== mouse.target.index)) // or clicked item is not pointerdown item
+                    mouse.clicked.index !== mouse.target.index) ||
+                !mouse.showRadius) // or clicked item is not pointerdown item
         ) {
             // console.log("entering dragStart move");
             closePoint();
@@ -253,8 +255,9 @@ function App() {
             dragIs[mouse.clicked.index].tags?.showRadius
         ) {
             mouse.resizing.mode = true;
+            mouse.showRadius = true;
             mouse.target.initialRadius = dragIs[mouse.clicked.index].radius;
-            console.log("hi resize");
+            // console.log("hi resize");
         }
         setDragIs([...dragIs]);
         setMouse(mouse);
@@ -297,18 +300,18 @@ function App() {
         }
         // resizing
         else if (mouse.resizing.mode) {
-            console.log("point is at ", pointCentre(mouse.clicked.index));
+            // console.log("point is at ", pointCentre(mouse.clicked.index));
             let r = dist(pointCentre(mouse.clicked.index), {
                 x: mouse.pos.middle.x - 20,
                 y: mouse.pos.middle.y - 20,
             });
-            console.log(r - 25, mouse.target.initialRadius);
+            // console.log(r - 25, mouse.target.initialRadius);
             if (mouse.resizing.start) {
                 dragIs[mouse.clicked.index].radius = Math.max(
                     Math.abs(r) - 25,
                     0
                 );
-                console.log(Math.abs(r), dragIs[mouse.clicked.index].radius);
+                // console.log(Math.abs(r), dragIs[mouse.clicked.index].radius);
             } else if (r - 25 >= mouse.target.initialRadius) {
                 dragIs[mouse.clicked.index].tags
                     ? (dragIs[mouse.clicked.index].tags.resizing = true)
@@ -368,7 +371,7 @@ function App() {
             (target.classList.contains("dragItem") ||
                 target.classList.contains("dragIWeight"))
         ) {
-            console.log("Hello click");
+            // console.log("Hello click");
             dragIs[index].containerRef.current.style.zIndex = dragIs[index]
                 .clicked
                 ? 1
@@ -384,6 +387,7 @@ function App() {
                 mouse.clicked.target = target;
                 mouse.clicked.index = getIndex(target);
                 closePoint(mouse.clicked.index);
+                mouse.showRadius = true;
                 dragIs[mouse.clicked.index].tags = {
                     clicked: true,
                     showRadius: true,
@@ -400,11 +404,11 @@ function App() {
             }
             // onPointClick(index, !dragIs[index].clicked);
         } else if (mouse.resizing.start) {
-            console.log("hello resize");
+            // console.log("hello resize");
             delete dragIs[index].tags.resizing;
             // dragIs[index].oldRadius = dragIs[index].radius;
         } else if (mouse.active) {
-            console.log("hello active fello, go to sleep");
+            // console.log("hello active fello, go to sleep");
             closePoint();
             mouse.active = false;
             dragIs[index].containerRef.current.style.zIndex = 1;
@@ -548,9 +552,11 @@ function App() {
             if (dragIs[index].tags.showPicker) {
                 delete dragIs[index].tags.showPicker;
                 dragIs[index].tags.showRadius = true;
+                mouse.showRadius = true;
             } else {
                 dragIs[index].tags.showPicker = true;
                 delete dragIs[index].tags.showRadius;
+                mouse.showRadius = false;
             }
         } else dragIs[index].tags = { showPicker: true };
         setDragIs([...dragIs]);
@@ -566,7 +572,7 @@ function App() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dragIs]);
     useEffect(() => {
-        console.log("tT", mouse);
+        // console.log("tT", mouse);
     }, []);
     return (
         <div
