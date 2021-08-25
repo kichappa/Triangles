@@ -314,6 +314,8 @@ function App() {
                     : (dragIs[mouse.clicked.index].tags = { resizing: true });
                 mouse.resizing.start = true;
             }
+        } else if (mouse.down) {
+            dragStart(e);
         }
         // else if (mouseBound.clicked.status && mouseBound.resizing) {
         //     let index = mouseBound.clicked.index;
@@ -406,7 +408,7 @@ function App() {
             mouse.active = false;
             dragIs[index].containerRef.current.style.zIndex = 1;
         }
-        mouse.pos.down = false;
+        mouse.down = false;
         mouse.active = false;
         mouse.resizing.mode = false;
         mouse.resizing.start = false;
