@@ -249,7 +249,8 @@ function App() {
         else if (
             // clicked item is pointerdown item
             mouse.clicked.status &&
-            mouse.clicked.index === mouse.target.index
+            mouse.clicked.index === mouse.target.index &&
+            dragIs[mouse.clicked.index].tags?.showRadius
         ) {
             mouse.resizing.mode = true;
             mouse.target.initialRadius = dragIs[mouse.clicked.index].radius;
