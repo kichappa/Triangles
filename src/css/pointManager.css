@@ -33,9 +33,12 @@
     align-items: center;
     align-content: stretch;
 
+    transition: all 0.2s cubic-bezier(0.39, 0.58, 0.57, 1);
+
     overflow: hidden;
     touch-action: none;
 }
+
 #point-manager button {
     margin: 10px;
     height: 40px;
@@ -95,7 +98,11 @@
     border: 2px solid #ffffff98;
     border-radius: 6px;
     padding: 0 10px 0 10px;
-    transition: all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1);
+    transition: all 0.2s ease-in-out;
+}
+
+.urButton.hidden {
+    opacity: 0%;
 }
 
 @media (hover: hover) and (pointer: fine) {
