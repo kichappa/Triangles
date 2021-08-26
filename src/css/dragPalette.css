@@ -11,6 +11,7 @@
 }
 
 .dragItem {
+    -webkit-tap-highlight-color: transparent;
     box-sizing: border-box;
     z-index: 1;
     touch-action: none;
@@ -84,6 +85,13 @@
     cursor: pointer;
     border-width: 8px;
     box-shadow: 0px 0px 4px rgba(53, 53, 53, 0.5);
+}
+
+.dragItem:active {
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    border-width: 8px;
 }
 
 .dragIContainer {
