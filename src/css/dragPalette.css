@@ -21,7 +21,8 @@
     border-radius: 50%;
     touch-action: none;
     user-select: none;
-    transition: all 0.2s cubic-bezier(0.39, 0.58, 0.57, 1);
+    transition: all 0.2s cubic-bezier(0.39, 0.58, 0.57, 1),
+        background-color 0.3s cubic-bezier(1, -0.01, 0.95, -0.11);
     position: absolute;
     transform: translate(-50%, -50%);
 }

@@ -26,7 +26,9 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                 flexWrap: "nowrap",
             },
             point_unclicked: {
-                backgroundColor: "#FFFFFF00",
+                backgroundColor: points[index].tags?.showRadius
+                    ? colour
+                    : "#FFFFFF00",
             },
             point_clicked: { backgroundColor: colour },
             radius: {
