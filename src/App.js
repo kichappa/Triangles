@@ -4,8 +4,10 @@ import Canvas from "./components/Canvas";
 import { FaPlus, FaMinus, FaUndoAlt, FaRedoAlt } from "react-icons/fa";
 
 function App() {
+    const [stateManager, setStateManager] = useState(false);
     const [mouse, setMouse] = useState({
         down: false,
+        stateSaved: false,
         clicked: {
             status: false,
             index: undefined,
@@ -41,6 +43,8 @@ function App() {
             },
         },
     });
+    const [undo, setUndo] = useState([]);
+    const [redo, setRedo] = useState([]);
     const rgbToHslHsvHex = (rgb) => {
         var rgbArr = [rgb.r, rgb.g, rgb.b];
         var M, m, C, hue, V, L, Sv, Sl;
@@ -128,6 +132,9 @@ function App() {
     };
     const [canvasPoints, setCanvasPoints] = useState(false);
     const addDragItem = () => {
+        saveUndoRedo("undo");
+        setRedo([]);
+        setStateManager(true);
         var currentXY = { x: 50, y: 50 },
             colour;
         if (dragIs.length > 0) {
@@ -168,6 +175,9 @@ function App() {
         setDragIs([...dragIs, newDragItem]);
     };
     const removeDragItem = ({ index }) => {
+        saveUndoRedo("undo");
+        setRedo([]);
+        setStateManager(true);
         if (index === -1) {
             index = dragIs.length - 1;
         }
@@ -178,8 +188,8 @@ function App() {
         console.log("New points are ", dragIs);
     };
     const dragStart = (e) => {
-        e.preventDefault();
         // console.log("Hi start");
+        // e.preventDefault();
         // setting mouse elements at pointerDown
         mouse.down = true;
         if (e.type.substr(0, 5) === "touch") {
@@ -195,6 +205,7 @@ function App() {
         mouse.target.obj = document.elementFromPoint(e.clientX, e.clientY);
         var index = getIndex(mouse.target.obj);
         mouse.target.index = index;
+
         // console.log("target is", mouse.target.obj);
         // console.log("whosClicked", whosClicked());
         // console.log(
@@ -229,7 +240,13 @@ function App() {
             // console.log("entering dragStart move");
             // console.log(mouse.target.obj);
             // console.log(index);
+
             if (index) {
+                if (!stateManager) {
+                    saveUndoRedo("undo");
+                    setRedo([]);
+                    setStateManager(true);
+                }
                 mouse.target.index = index;
                 // console.log("Init XY", dragIs[mouse.target.index].currentXY);
                 mouse.target.init = {
@@ -255,6 +272,13 @@ function App() {
             mouse.clicked.index === mouse.target.index &&
             dragIs[mouse.clicked.index].tags?.showRadius
         ) {
+            // console.log("Hi", stateManager);
+            if (!stateManager) {
+                // console.log("Hi");
+                saveUndoRedo("undo");
+                setRedo([]);
+                setStateManager(true);
+            }
             mouse.resizing.mode = true;
             mouse.showRadius = true;
             mouse.target.initialRadius = dragIs[mouse.clicked.index].radius;
@@ -264,7 +288,14 @@ function App() {
         setMouse(mouse);
     };
     const drag = (e) => {
-        e.preventDefault();
+        // console.log(
+        //     document
+        //         .elementFromPoint(e.clientX, e.clientY)
+        //         .classList.contains("undoButton"),
+        //     document.elementFromPoint(e.clientX, e.clientY).classList,
+        //     document.elementFromPoint(e.clientX, e.clientY)
+        // );
+        // e.preventDefault();
         // mouse.target.obj = document.elementFromPoint(e.clientX, e.clientY);
         if (e.type.substr(0, 5) === "touch") {
             mouse.pos.middle = {
@@ -284,6 +315,7 @@ function App() {
             closePoint();
             var index = mouse.target.index;
             if (index) {
+                e.preventDefault();
                 try {
                     dragIs[index].containerRef.current.style.zIndex = 2; // bringing item to top
                 } catch {}
@@ -364,7 +396,7 @@ function App() {
         setMouse(mouse);
     };
     const dragEnd = (e) => {
-        e.preventDefault();
+        // e.preventDefault();
         if (e.type.substr(0, 5) === "touch") {
             mouse.pos.end = {
                 x: e.touches[0].clientX,
@@ -417,6 +449,7 @@ function App() {
                     mouse.clicked.target = undefined;
                     mouse.clicked.index = undefined;
                 }
+                popUndoRedo("undo");
                 // onPointClick(index, !dragIs[index].clicked);
             } else if (mouse.resizing.start) {
                 // console.log("hello resize");
@@ -436,7 +469,11 @@ function App() {
             mouse.resizing.start = false;
             setDragIs([...dragIs]);
             setMouse(mouse);
+        } else {
+            mouse.down = false;
+            setDragIs([...dragIs]);
         }
+        setStateManager(false);
         // console.log("after clicked", mouse.clicked.status);
     };
     const getIndex = (obj) => {
@@ -560,10 +597,15 @@ function App() {
         }
         if (update) setDragIs(dragIs);
     };
-    const onChangeColor = (index, color) => {
+    const onChangeColor = (index, color, complete = false) => {
         let newDragIs = [...dragIs];
         newDragIs[index].colour = color;
         setDragIs([...newDragIs]);
+        if (complete) {
+            saveUndoRedo("undo");
+            setRedo([]);
+            setStateManager(true);
+        }
     };
     const onPickerButton = (index) => {
         if (dragIs[index].tags) {
@@ -578,6 +620,42 @@ function App() {
             }
         } else dragIs[index].tags = { showPicker: true };
         setDragIs([...dragIs]);
+    };
+    const saveUndoRedo = (action) => {
+        console.log("calling once");
+        let state = [];
+        for (let i in dragIs) {
+            let item = { ...dragIs[i] };
+            item.pointRef = undefined;
+            item.containerRef = undefined;
+            state.push(JSON.parse(JSON.stringify(item)));
+        }
+        if (action === "undo") setUndo([...undo, state]);
+        else if (action === "redo") setRedo([...redo, state]);
+    };
+    const popUndoRedo = (action) => {
+        let stateHistory;
+        if (action === "undo") {
+            stateHistory = [...undo];
+            stateHistory.pop();
+            setUndo(stateHistory);
+        } else if (action === "redo") {
+            stateHistory = [...redo];
+            stateHistory.pop();
+            setRedo(stateHistory);
+        }
+    };
+    const undoRedoClicked = (action) => {
+        if (action === "undo" && undo.length) {
+            saveUndoRedo("redo");
+            setDragIs(undo.pop());
+            setUndo(undo);
+        } else if (action === "redo" && redo.length) {
+            saveUndoRedo("undo");
+            setDragIs(redo.pop());
+            setUndo(redo);
+        }
+        mouse.down = false;
     };
     useEffect(() => {
         getCanvasPoints(true);
@@ -621,6 +699,26 @@ function App() {
                         onClick={() => removeDragItem({ index: -1 })}
                     >
                         <FaMinus />
+                    </button>
+                </div>
+                <div id="undo" className="undo-redo undoButton">
+                    <button
+                        className="button undoButton"
+                        onClick={() => {
+                            undoRedoClicked("undo");
+                        }}
+                    >
+                        <FaUndoAlt className="undoButton" />
+                    </button>
+                </div>
+                <div id="redo" className="undo-redo">
+                    <button
+                        className="button"
+                        onClick={() => {
+                            undoRedoClicked("redo");
+                        }}
+                    >
+                        <FaRedoAlt />
                     </button>
                 </div>
             </div>

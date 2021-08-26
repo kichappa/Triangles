@@ -118,6 +118,9 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                     style={styles.pickerBar}
                     color={colour}
                     onChange={(color) => onChangeColor(index, color)}
+                    onChangeComplete={(color) =>
+                        onChangeColor(index, color, true)
+                    }
                     disableAlpha={true}
                     presetColors={[]}
                 />
