@@ -229,6 +229,14 @@ function App() {
         //                 mouse.target.obj.parentNode.children[1])
         // );
         // moving point
+        if (mouse.target.obj.classList.contains("dragItem")) {
+            if (!stateManager) {
+                // console.log("Hi");
+                saveUndoRedo("undo");
+                setRedo([]);
+                setStateManager(true);
+            }
+        }
         if (
             // if pointerdown on the a dragItem
             mouse.target.obj.classList.contains("dragItem") &&
@@ -242,11 +250,6 @@ function App() {
             // console.log(index);
 
             if (index) {
-                if (!stateManager) {
-                    saveUndoRedo("undo");
-                    setRedo([]);
-                    setStateManager(true);
-                }
                 mouse.target.index = index;
                 // console.log("Init XY", dragIs[mouse.target.index].currentXY);
                 mouse.target.init = {
@@ -273,12 +276,12 @@ function App() {
             dragIs[mouse.clicked.index].tags?.showRadius
         ) {
             // console.log("Hi", stateManager);
-            if (!stateManager) {
-                // console.log("Hi");
-                saveUndoRedo("undo");
-                setRedo([]);
-                setStateManager(true);
-            }
+            // if (!stateManager) {
+            //     // console.log("Hi");
+            //     saveUndoRedo("undo");
+            //     setRedo([]);
+            //     setStateManager(true);
+            // }
             mouse.resizing.mode = true;
             mouse.showRadius = true;
             mouse.target.initialRadius = dragIs[mouse.clicked.index].radius;
@@ -316,6 +319,13 @@ function App() {
             var index = mouse.target.index;
             if (index) {
                 e.preventDefault();
+                let undoButton = document.getElementsByClassName("urButton");
+                // console.log(undoButton);
+                for (let k in undoButton) {
+                    if (undoButton[k].classList)
+                        undoButton[k].classList.add("hidden");
+                }
+                // console.log(undoButton);
                 try {
                     dragIs[index].containerRef.current.style.zIndex = 2; // bringing item to top
                 } catch {}
@@ -449,13 +459,19 @@ function App() {
                     mouse.clicked.target = undefined;
                     mouse.clicked.index = undefined;
                 }
-                popUndoRedo("undo");
+                // popUndoRedo("undo");
                 // onPointClick(index, !dragIs[index].clicked);
             } else if (mouse.resizing.start) {
                 // console.log("hello resize");
                 delete dragIs[index].tags.resizing;
                 // dragIs[index].oldRadius = dragIs[index].radius;
             } else if (mouse.active) {
+                let undoButton = document.getElementsByClassName("urButton");
+                // console.log(undoButton);
+                for (let k in undoButton) {
+                    if (undoButton[k].classList)
+                        undoButton[k].classList.remove("hidden");
+                }
                 // console.log("hello active fello, go to sleep");
                 closePoint();
                 mouse.active = false;
@@ -597,15 +613,17 @@ function App() {
         }
         if (update) setDragIs(dragIs);
     };
-    const onChangeColor = (index, color, complete = false) => {
-        let newDragIs = [...dragIs];
-        newDragIs[index].colour = color;
-        setDragIs([...newDragIs]);
-        if (complete) {
+    const onChangeColor = (index, color, stateMan = false) => {
+        if (!stateManager) {
+            // console.log("setting color before new", stateMan);
             saveUndoRedo("undo");
             setRedo([]);
             setStateManager(true);
         }
+        let newDragIs = [...dragIs];
+        newDragIs[index].colour = color;
+        setDragIs([...newDragIs]);
+        setStateManager(stateMan);
     };
     const onPickerButton = (index) => {
         if (dragIs[index].tags) {
@@ -622,13 +640,30 @@ function App() {
         setDragIs([...dragIs]);
     };
     const saveUndoRedo = (action) => {
-        console.log("calling once");
+        // console.log("calling once");
         let state = [];
         for (let i in dragIs) {
             let item = { ...dragIs[i] };
             item.pointRef = undefined;
             item.containerRef = undefined;
-            state.push(JSON.parse(JSON.stringify(item)));
+            delete item.tags;
+            let newState = JSON.stringify(item);
+            if (action === "undo") {
+                // console.log(!undo.length);
+                if (
+                    !undo.length ||
+                    JSON.stringify(undo[undo.length - 1] != newState)
+                ) {
+                    // console.log("hi");
+                    state.push(JSON.parse(newState));
+                }
+            } else if (action === "redo") {
+                if (
+                    !redo.length ||
+                    JSON.stringify(redo[redo.length - 1] != newState)
+                )
+                    state.push(JSON.parse(newState));
+            }
         }
         if (action === "undo") setUndo([...undo, state]);
         else if (action === "redo") setRedo([...redo, state]);
@@ -653,11 +688,12 @@ function App() {
         } else if (action === "redo" && redo.length) {
             saveUndoRedo("undo");
             setDragIs(redo.pop());
-            setUndo(redo);
+            setRedo(redo);
         }
         mouse.down = false;
     };
     useEffect(() => {
+        // console.log(stateManager);
         getCanvasPoints(true);
         // console.log(
         //     dragIs[0]?.pointRef.current.offsetWidth,
@@ -703,7 +739,7 @@ function App() {
                 </div>
                 <div id="undo" className="undo-redo undoButton">
                     <button
-                        className="button undoButton"
+                        className="button urButton"
                         onClick={() => {
                             undoRedoClicked("undo");
                         }}
@@ -713,7 +749,7 @@ function App() {
                 </div>
                 <div id="redo" className="undo-redo">
                     <button
-                        className="button"
+                        className="button urButton"
                         onClick={() => {
                             undoRedoClicked("redo");
                         }}

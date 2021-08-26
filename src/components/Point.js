@@ -117,9 +117,9 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                 <SketchPicker
                     style={styles.pickerBar}
                     color={colour}
-                    onChange={(color) => onChangeColor(index, color)}
+                    onChange={(color) => onChangeColor(index, color, true)}
                     onChangeComplete={(color) =>
-                        onChangeColor(index, color, true)
+                        onChangeColor(index, color, false)
                     }
                     disableAlpha={true}
                     presetColors={[]}
