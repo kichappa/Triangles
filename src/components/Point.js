@@ -26,13 +26,7 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                 flexWrap: "nowrap",
             },
             point_unclicked: {
-                backgroundColor: colour,
-                ":hover": {
-                    width: "35px",
-                    height: "35px",
-                    cursor: "pointer",
-                    borderWidth: "8px",
-                },
+                backgroundColor: "#FFFFFF00",
             },
             point_clicked: { backgroundColor: colour },
             radius: {
@@ -43,8 +37,12 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                     ? 2 * points[index].radius + 50 + "px"
                     : "0px",
                 transition: points[index].tags?.resizing
-                    ? "all 0s cubic-bezier(0.52, -1.01, 0.51, 1.94) 0s"
-                    : "all 0.3s cubic-bezier(0.52, -1.01, 0.51, 1.94) 0s",
+                    ? `all 0s cubic-bezier(0.52, -1.01, ${1 - 0.52}, ${
+                          1 + 1.01
+                      }) 0s`
+                    : `all 0.3s cubic-bezier(0.52, -1.01, ${1 - 0.52}, ${
+                          1 + 1.01
+                      }) 0s`,
             },
             pickerButton: {
                 width: points[index].tags?.clicked ? 30 + "px" : "0px",
@@ -58,8 +56,12 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                         : `translate(-50%, -60px)`
                     : "translate(-50%, -50%)",
                 transition: points[index].tags?.resizing
-                    ? "all 0s cubic-bezier(0.52, -1.01, 0.51, 1.94) 0s"
-                    : "all 0.3s cubic-bezier(0.52, -1.01, 0.51, 1.94) 0s",
+                    ? `all 0s cubic-bezier(0.52, -1.01, ${1 - 0.52}, ${
+                          1 + 1.01
+                      }) 0s, color 0s`
+                    : `all 0.3s cubic-bezier(0.52, -1.01, ${1 - 0.52}, ${
+                          1 + 1.01
+                      }) 0s, color 0s`,
                 color: colour,
             },
             pickerBar: {
@@ -105,6 +107,7 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                                 ? " active"
                                 : "")
                         }
+                        tabIndex={1}
                         id={points[index].id}
                     />
                 </div>
