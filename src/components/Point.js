@@ -43,13 +43,13 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                     ? 2 * points[index].radius + 50 + "px"
                     : "0px",
                 transition: points[index].tags?.resizing
-                    ? "all 0s cubic-bezier(0.39, 0.58, 0.57, 1)"
-                    : "all 0.3s cubic-bezier(0.39, 0.58, 0.57, 1)",
+                    ? "all 0s cubic-bezier(0.52, -1.01, 0.51, 1.94) 0s"
+                    : "all 0.3s cubic-bezier(0.52, -1.01, 0.51, 1.94) 0s",
             },
             pickerButton: {
                 width: points[index].tags?.clicked ? 30 + "px" : "0px",
                 height: points[index].tags?.clicked ? 30 + "px" : "0px",
-                fontSize: 30 / 2.5 + "pt",
+                fontSize: points[index].tags?.clicked ? 30 / 2.5 + "pt" : "0pt",
                 transform: points[index].tags?.clicked
                     ? points[index].tags?.showRadius
                         ? `translate(-50%, calc(-40px - ${
@@ -58,8 +58,8 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                         : `translate(-50%, -60px)`
                     : "translate(-50%, -50%)",
                 transition: points[index].tags?.resizing
-                    ? "all 0s cubic-bezier(0.39, 0.58, 0.57, 1)"
-                    : "all 0.3s cubic-bezier(0.39, 0.58, 0.57, 1)",
+                    ? "all 0s cubic-bezier(0.52, -1.01, 0.51, 1.94) 0s"
+                    : "all 0.3s cubic-bezier(0.52, -1.01, 0.51, 1.94) 0s",
                 color: colour,
             },
             pickerBar: {

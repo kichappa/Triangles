@@ -224,8 +224,7 @@ function App() {
                     mouse.clicked.index !== mouse.target.index) ||
                 !mouse.showRadius) // or clicked item is not pointerdown item
         ) {
-            // console.log("entering dragStart move");
-            closePoint();
+            console.log("entering dragStart move");
             // console.log(mouse.target.obj);
             // console.log(index);
             if (index) {
@@ -279,6 +278,7 @@ function App() {
             // see if these are needed...
             // onPointClick(index, false);
             // closePickers(index);
+            closePoint();
             e.preventDefault();
             var index = mouse.target.index;
             dragIs[index].containerRef.current.style.zIndex = 2; // bringing item to top
@@ -376,13 +376,13 @@ function App() {
                 .clicked
                 ? 1
                 : 2;
-            // console.log("clicked", mouse.clicked.status);
+            console.log("clicked", mouse.clicked.status);
             // console.log(!mouse.clicked.status);
             if (
                 !mouse.clicked.status ||
                 (mouse.clicked.target && mouse.clicked.target !== target)
             ) {
-                // console.log("clicking", target);
+                console.log("clicking", target);
                 mouse.clicked.status = true;
                 mouse.clicked.target = target;
                 mouse.clicked.index = getIndex(target);
