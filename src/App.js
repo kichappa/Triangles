@@ -4,7 +4,7 @@ import Canvas from "./components/Canvas";
 import { FaPlus, FaMinus, FaUndoAlt, FaRedoAlt } from "react-icons/fa";
 
 function App() {
-    const [stateManager, setStateManager] = useState(false);
+    const [potChange, setPotChange] = useState(false);
     const [mouse, setMouse] = useState({
         down: false,
         stateSaved: false,
@@ -43,8 +43,10 @@ function App() {
             },
         },
     });
+    const [view, setView] = useState([]);
     const [undo, setUndo] = useState([]);
     const [redo, setRedo] = useState([]);
+    const [undoRedo, setUndoRedo] = useState(false);
     const rgbToHslHsvHex = (rgb) => {
         var rgbArr = [rgb.r, rgb.g, rgb.b];
         var M, m, C, hue, V, L, Sv, Sl;
@@ -132,9 +134,9 @@ function App() {
     };
     const [canvasPoints, setCanvasPoints] = useState(false);
     const addDragItem = () => {
-        saveUndoRedo("undo");
-        setRedo([]);
-        setStateManager(true);
+        // saveUndoRedo("undo");
+        // setRedo([]);
+        // setStateManager(true);
         var currentXY = { x: 50, y: 50 },
             colour;
         if (dragIs.length > 0) {
@@ -173,11 +175,12 @@ function App() {
             containerSize: undefined,
         };
         setDragIs([...dragIs, newDragItem]);
+        setPotChange(true);
     };
     const removeDragItem = ({ index }) => {
-        saveUndoRedo("undo");
-        setRedo([]);
-        setStateManager(true);
+        // saveUndoRedo("undo");
+        // setRedo([]);
+        // setStateManager(true);
         if (index === -1) {
             index = dragIs.length - 1;
         }
@@ -185,6 +188,7 @@ function App() {
         let newDragIs = dragIs;
         newDragIs.splice(index, 1);
         setDragIs([...newDragIs]);
+        setPotChange(true);
         console.log("New points are ", dragIs);
     };
     const dragStart = (e) => {
@@ -229,14 +233,14 @@ function App() {
         //                 mouse.target.obj.parentNode.children[1])
         // );
         // moving point
-        if (mouse.target.obj.classList.contains("dragItem")) {
-            if (!stateManager) {
-                // console.log("Hi");
-                saveUndoRedo("undo");
-                setRedo([]);
-                setStateManager(true);
-            }
-        }
+        // if (mouse.target.obj.classList.contains("dragItem")) {
+        //     if (!stateManager) {
+        //         // console.log("Hi");
+        //         saveUndoRedo("undo");
+        //         setRedo([]);
+        //         setStateManager(true);
+        //     }
+        // }
         if (
             // if pointerdown on the a dragItem
             mouse.target.obj.classList.contains("dragItem") &&
@@ -489,7 +493,7 @@ function App() {
             mouse.down = false;
             setDragIs([...dragIs]);
         }
-        setStateManager(false);
+        setPotChange(true);
         // console.log("after clicked", mouse.clicked.status);
     };
     const getIndex = (obj) => {
@@ -613,17 +617,82 @@ function App() {
         }
         if (update) setDragIs(dragIs);
     };
-    const onChangeColor = (index, color, stateMan = false) => {
-        if (!stateManager) {
-            // console.log("setting color before new", stateMan);
-            saveUndoRedo("undo");
-            setRedo([]);
-            setStateManager(true);
-        }
+    const onChangeColor = (index, color, finish = false) => {
+        // if (!finish) {
+        //     // console.log("setting color before new", stateMan);
+        //     saveUndoRedo("undo");
+        //     setRedo([]);
+        //     setStateManager(true);
+        // }
         let newDragIs = [...dragIs];
         newDragIs[index].colour = color;
         setDragIs([...newDragIs]);
-        setStateManager(stateMan);
+        if (finish) setPotChange(true);
+        // setStateManager(finish);
+    };
+    const pushToView = (state, dontCopyToRedo = false) => {
+        // console.log("test");
+        // if (!dontCopyToRedo) {
+        //     console.log("Is Different state?", differentState(state, view));
+        // }
+        if (dontCopyToRedo) {
+        } else if (differentState(state, view)) {
+            // console.log("Different state, inside pushToView", !dontCopyToRedo);
+
+            console.log("Setting undo");
+            setUndo([...undo, view]);
+        }
+        let newView = copyDragIs(state);
+        setView(newView);
+    };
+    const differentState = (newState, oldState) => {
+        // console.trace();
+        let diff =
+            JSON.stringify(removeDOMItems(newState)) !=
+            JSON.stringify(removeDOMItems(oldState));
+        // console.log(
+        //     diff
+        //         ? `"${JSON.stringify(
+        //               removeDOMItems(newState),
+        //               null,
+        //               2
+        //           )}",\n\n"${JSON.stringify(
+        //               removeDOMItems(newState),
+        //               null,
+        //               2
+        //           )}",\n`
+        //         : "",
+        //     `Different?`,
+        //     diff
+        // );
+        return (
+            JSON.stringify(removeDOMItems(newState)) !=
+            JSON.stringify(removeDOMItems(oldState))
+        );
+    };
+    const copyDragIs = (state) => {
+        // let copyState = new Array(0);
+        // for (let i in state) {
+        //     let item = { ...state[i] };
+        //     copyState.push(item);
+        // }
+        let copyState = JSON.parse(JSON.stringify(removeDOMItems(state)));
+        return copyState;
+    };
+    const removeDOMItems = (state) => {
+        let minimalState = [];
+        for (let i in state) {
+            let item = { ...state[i] };
+            try {
+                item.pointRef = undefined;
+                item.containerRef = undefined;
+                delete item.tags;
+            } catch (error) {
+                console.error("Error in removing DOM elements.", error);
+            }
+            minimalState.push(item);
+        }
+        return minimalState;
     };
     const onPickerButton = (index) => {
         if (dragIs[index].tags) {
@@ -641,32 +710,21 @@ function App() {
     };
     const saveUndoRedo = (action) => {
         // console.log("calling once");
-        let state = [];
-        for (let i in dragIs) {
-            let item = { ...dragIs[i] };
-            item.pointRef = undefined;
-            item.containerRef = undefined;
-            delete item.tags;
-            let newState = JSON.stringify(item);
-            if (action === "undo") {
-                // console.log(!undo.length);
-                if (
-                    !undo.length ||
-                    JSON.stringify(undo[undo.length - 1] != newState)
-                ) {
-                    // console.log("hi");
-                    state.push(JSON.parse(newState));
-                }
-            } else if (action === "redo") {
-                if (
-                    !redo.length ||
-                    JSON.stringify(redo[redo.length - 1] != newState)
-                )
-                    state.push(JSON.parse(newState));
-            }
+        let state;
+        let newState = JSON.stringify(removeDOMItems(dragIs), null, 2);
+        if (action === "undo") {
+            // if (!undo.length || differentState(dragIs, undo[undo.length - 1])) {
+            // console.log(JSON.parse(newState));
+            state = JSON.parse(newState);
+            // }
+        } else if (action === "redo") {
+            // if (!redo.length || differentState(dragIs, redo[redo.length - 1]))
+            state = JSON.parse(newState);
         }
-        if (action === "undo") setUndo([...undo, state]);
-        else if (action === "redo") setRedo([...redo, state]);
+        console.log(state);
+
+        if (action === "undo" && state) setUndo([...undo, state]);
+        else if (action === "redo" && state) setRedo([...redo, state]);
     };
     const popUndoRedo = (action) => {
         let stateHistory;
@@ -682,29 +740,44 @@ function App() {
     };
     const undoRedoClicked = (action) => {
         if (action === "undo" && undo.length) {
-            saveUndoRedo("redo");
-            setDragIs(undo.pop());
-            setUndo(undo);
+            setRedo([...redo, view]);
+            setDragIs(undo[undo.length - 1]);
+            console.log(undo.slice(0, undo.length - 1));
+            setUndo(undo.slice(0, undo.length - 1));
+            setUndoRedo(true);
+            setPotChange(true);
+            // legacy method
+            // saveUndoRedo("redo");
+            // setDragIs(undo.pop());
+            // setUndo(undo);
         } else if (action === "redo" && redo.length) {
-            saveUndoRedo("undo");
-            setDragIs(redo.pop());
-            setRedo(redo);
+            setUndo([...undo, view]);
+            setDragIs(redo[redo.length - 1]);
+            setRedo(redo.slice(0, redo.length - 1));
+            setUndoRedo(true);
+            setPotChange(true);
+            // legacy method
+            // saveUndoRedo("undo");
+            // setDragIs(redo.pop());
+            // setRedo(redo);
         }
         mouse.down = false;
     };
     useEffect(() => {
-        // console.log(stateManager);
+        if (potChange) {
+            console.log("Calling pushToView", potChange);
+            pushToView(dragIs, undoRedo);
+            if (undoRedo) setUndoRedo(false);
+            setPotChange(false);
+        }
+    }, [potChange]);
+    useEffect(() => {
         getCanvasPoints(true);
-        // console.log(
-        //     dragIs[0]?.pointRef.current.offsetWidth,
-        //     dragIs[0]?.pointRef.current.offsetHeight,
-        //     dragIs[0]?.pointRef.current.parentNode.parentNode.offsetWidth,
-        //     dragIs[0]?.pointRef.current.parentNode.parentNode.offsetHeight
-        // );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dragIs]);
     useEffect(() => {
-        // console.log("tT", mouse);
+        console.log("Calling pushToView during init");
+        pushToView(dragIs, true);
+        setPotChange(false);
     }, []);
     return (
         <div
