@@ -99,10 +99,6 @@
     padding: 0 10px 0 10px;
 }
 
-.hideButton {
-    opacity: 100%;
-}
-
 .hideButton.hidden {
     opacity: 0%;
 }
