@@ -471,7 +471,7 @@ function App() {
                 delete dragIs[index].tags.resizing;
                 // dragIs[index].oldRadius = dragIs[index].radius;
             } else if (mouse.active) {
-                hideButton(false, 1300);
+                hideButton(false);
                 // console.log("hello active fello, go to sleep");
                 closePoint();
                 mouse.active = false;
@@ -501,6 +501,7 @@ function App() {
         return undefined;
     };
     async function hideButton(state, timeout) {
+        if (!state && !timeout) timeout = 700;
         setTimeout(() => {
             let undoButton = document.getElementsByClassName("hideButton");
             // console.log(undoButton);
@@ -509,7 +510,7 @@ function App() {
                     if (state) {
                         undoButton[k].classList.add("hidden");
                         undoButton[k].style.transition =
-                            "all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1), opacity 0.3s ease-in-out";
+                            "all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1), opacity 0.15s ease-in-out";
                     } else {
                         undoButton[k].classList.remove("hidden");
                         undoButton[k].style.transition =
