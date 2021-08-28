@@ -67,7 +67,6 @@
     border: none;
     border-radius: 6px;
     padding: 0 10px 0 10px;
-    transition: all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1);
 }
 
 .undo-redo button {
@@ -98,10 +97,13 @@
     border: 2px solid #ffffff98;
     border-radius: 6px;
     padding: 0 10px 0 10px;
-    transition: all 0.2s ease-in-out;
 }
 
-.urButton.hidden {
+.hideButton {
+    opacity: 100%;
+}
+
+.hideButton.hidden {
     opacity: 0%;
 }
 

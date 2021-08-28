@@ -323,12 +323,13 @@ function App() {
             var index = mouse.target.index;
             if (index) {
                 e.preventDefault();
-                let undoButton = document.getElementsByClassName("urButton");
-                // console.log(undoButton);
-                for (let k in undoButton) {
-                    if (undoButton[k].classList)
-                        undoButton[k].classList.add("hidden");
-                }
+                hideButton(true, 0);
+                // let undoButton = document.getElementsByClassName("hideButton");
+                // // console.log(undoButton);
+                // for (let k in undoButton) {
+                //     if (undoButton[k].classList)
+                //         undoButton[k].classList.add("hidden");
+                // }
                 // console.log(undoButton);
                 try {
                     dragIs[index].containerRef.current.style.zIndex = 2; // bringing item to top
@@ -470,12 +471,7 @@ function App() {
                 delete dragIs[index].tags.resizing;
                 // dragIs[index].oldRadius = dragIs[index].radius;
             } else if (mouse.active) {
-                let undoButton = document.getElementsByClassName("urButton");
-                // console.log(undoButton);
-                for (let k in undoButton) {
-                    if (undoButton[k].classList)
-                        undoButton[k].classList.remove("hidden");
-                }
+                hideButton(false, 1300);
                 // console.log("hello active fello, go to sleep");
                 closePoint();
                 mouse.active = false;
@@ -504,6 +500,24 @@ function App() {
         }
         return undefined;
     };
+    async function hideButton(state, timeout) {
+        setTimeout(() => {
+            let undoButton = document.getElementsByClassName("hideButton");
+            // console.log(undoButton);
+            for (let k in undoButton) {
+                if (undoButton[k].classList)
+                    if (state) {
+                        undoButton[k].classList.add("hidden");
+                        undoButton[k].style.transition =
+                            "all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1), opacity 0.3s ease-in-out";
+                    } else {
+                        undoButton[k].classList.remove("hidden");
+                        undoButton[k].style.transition =
+                            "all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1), opacity 1s ease-in-out";
+                    }
+            }
+        }, timeout);
+    }
     const pointCentre = (index) => {
         let centre = {
             x: dragIs[index].currentXY.x + dragIs[index].containerSize[0] / 2,
@@ -641,7 +655,7 @@ function App() {
         } else if (differentState(state, view)) {
             // console.log("Different state, inside pushToView", !dontCopyToRedo);
 
-            console.log("Setting undo");
+            // console.log("Setting undo");
             setUndo([...undo, view]);
             setRedo([]);
             let newView = copyDragIs(state);
@@ -768,7 +782,7 @@ function App() {
     };
     useEffect(() => {
         if (potChange) {
-            console.log("Calling pushToView", potChange);
+            // console.log("Calling pushToView", potChange);
             pushToView(dragIs, undoRedo);
             if (undoRedo) setUndoRedo(false);
             setPotChange(false);
@@ -778,7 +792,7 @@ function App() {
         getCanvasPoints(true);
     }, [dragIs]);
     useEffect(() => {
-        console.log("Calling pushToView during init");
+        // console.log("Calling pushToView during init");
         pushToView(dragIs, true);
         setPotChange(false);
     }, []);
@@ -803,11 +817,14 @@ function App() {
                     onPickerButton={onPickerButton}
                 />
                 <div id="point-manager">
-                    <button className="button plus" onClick={addDragItem}>
+                    <button
+                        className="button plus hideButton"
+                        onClick={addDragItem}
+                    >
                         <FaPlus />
                     </button>
                     <button
-                        className="button minus"
+                        className="button minus hideButton"
                         onClick={() => removeDragItem({ index: -1 })}
                     >
                         <FaMinus />
@@ -815,7 +832,7 @@ function App() {
                 </div>
                 <div id="undo" className="undo-redo undoButton">
                     <button
-                        className="button urButton"
+                        className="button hideButton"
                         onClick={() => {
                             undoRedoClicked("undo");
                         }}
@@ -825,7 +842,7 @@ function App() {
                 </div>
                 <div id="redo" className="undo-redo">
                     <button
-                        className="button urButton"
+                        className="button hideButton"
                         onClick={() => {
                             undoRedoClicked("redo");
                         }}
