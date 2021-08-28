@@ -636,14 +636,17 @@ function App() {
         //     console.log("Is Different state?", differentState(state, view));
         // }
         if (dontCopyToRedo) {
+            let newView = copyDragIs(state);
+            setView(newView);
         } else if (differentState(state, view)) {
             // console.log("Different state, inside pushToView", !dontCopyToRedo);
 
             console.log("Setting undo");
             setUndo([...undo, view]);
+            setRedo([]);
+            let newView = copyDragIs(state);
+            setView(newView);
         }
-        let newView = copyDragIs(state);
-        setView(newView);
     };
     const differentState = (newState, oldState) => {
         // console.trace();
