@@ -795,6 +795,7 @@ function App() {
         // console.log("Calling pushToView during init");
         pushToView(dragIs, true);
         setPotChange(false);
+        hideButton(false, 500);
     }, []);
     return (
         <div
@@ -818,13 +819,13 @@ function App() {
                 />
                 <div id="point-manager">
                     <button
-                        className="button plus hideButton"
+                        className="button plus hideButton hidden"
                         onClick={addDragItem}
                     >
                         <FaPlus />
                     </button>
                     <button
-                        className="button minus hideButton"
+                        className="button minus hideButton hidden"
                         onClick={() => removeDragItem({ index: -1 })}
                     >
                         <FaMinus />
@@ -832,7 +833,7 @@ function App() {
                 </div>
                 <div id="undo" className="undo-redo undoButton">
                     <button
-                        className="button hideButton"
+                        className="button hideButton hidden"
                         onClick={() => {
                             undoRedoClicked("undo");
                         }}
@@ -842,7 +843,7 @@ function App() {
                 </div>
                 <div id="redo" className="undo-redo">
                     <button
-                        className="button hideButton"
+                        className="button hideButton hidden"
                         onClick={() => {
                             undoRedoClicked("redo");
                         }}
