@@ -93,7 +93,6 @@ const Point = ({ points, onChangeColor, index, onPickerButton }) => {
                         <FaTint />
                     </div>
                     <div
-                        // ref={points[index].pointRef}
                         style={styles.radius}
                         className="dragIWeight"
                         id={points[index].id}

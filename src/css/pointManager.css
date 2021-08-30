@@ -71,7 +71,6 @@
 }
 
 .undo-redo button {
-    /* margin: 10px; */
     height: 40px;
     width: 40px;
 
@@ -89,12 +88,6 @@
     text-align: center;
 
     background-color: #0000001c;
-    /* 
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6),
-        -2px -2px 8px rgba(133, 129, 129, 0.5),
-        inset -3px -3px 4px rgba(19, 20, 20, 0.5),
-        inset 2px 2px 4px rgba(106, 107, 109, 0.5); */
-
     border: 2px solid #ffffff98;
     border-radius: 6px;
     padding: 0 10px 0 10px;
@@ -127,11 +120,3 @@
             inset -5px -5px 10px rgba(45, 45, 47, 0.5);
     }
 }
-
-/* #point-manager .plus:before {
-    content: "\FF0B";
-} */
-
-/* #point-manager .minus::before {
-    content: "\2212";
-} */

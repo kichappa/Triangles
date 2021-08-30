@@ -70,10 +70,6 @@ function App() {
         else Sl = C / (255 * (1 - Math.abs(2 * L - 1)));
 
         hue = ((hue % 360) + 360) % 360;
-        // L = (L % 1 + 1)%1
-        // V = (V % 1 + 1)%1
-        // Sv = (Sv % 1 + 1)%1
-        // Sl = (Sl % 1 + 1)%1
         let hsv = { h: hue, s: Sv, v: V, a: 1 };
         let hsl = { h: hue, s: Sl, l: L, a: 1 };
         rgb.a = 1;
@@ -134,9 +130,6 @@ function App() {
     };
     const [canvasPoints, setCanvasPoints] = useState(false);
     const addDragItem = () => {
-        // saveUndoRedo("undo");
-        // setRedo([]);
-        // setStateManager(true);
         var currentXY = { x: 50, y: 50 },
             colour;
         if (dragIs.length > 0) {
@@ -166,7 +159,7 @@ function App() {
         const newDragItem = {
             ref: null,
             containerRef: null,
-            radius: 0, //1 + Math.random() * 2,
+            radius: 0,
             colour: colour,
             showPicker: false,
             pointerOffset: { x: 0, y: 0 },
@@ -178,9 +171,6 @@ function App() {
         setPotChange(true);
     };
     const removeDragItem = ({ index }) => {
-        // saveUndoRedo("undo");
-        // setRedo([]);
-        // setStateManager(true);
         if (index === -1) {
             index = dragIs.length - 1;
         }
@@ -192,9 +182,6 @@ function App() {
         console.log("New points are ", dragIs);
     };
     const dragStart = (e) => {
-        // console.log("Hi start");
-        // e.preventDefault();
-        // setting mouse elements at pointerDown
         mouse.down = true;
         if (e.type.substr(0, 5) === "touch") {
             mouse.pos.start = {
@@ -209,42 +196,9 @@ function App() {
         mouse.target.obj = document.elementFromPoint(e.clientX, e.clientY);
         var index = getIndex(mouse.target.obj);
         mouse.target.index = index;
-        // console.log("Target is ", mouse.target.obj, mouse.target.obj.id);
         if (!mouse.target.obj.classList.contains("dragItem")) {
-            // console.log("hi");
             hideButton(false, 0, "0.3s");
         }
-        // console.log("target is", mouse.target.obj);
-        // console.log("whosClicked", whosClicked());
-        // console.log(
-        //     !mouse.clicked.status,
-        //     mouse.clicked.index,
-        //     mouse.target.index,
-        //     mouse.clicked.index !== mouse.target.index,
-        //     !mouse.clicked.status ||
-        //         (mouse.clicked.status &&
-        //             mouse.clicked.index !== mouse.target.index)
-        // );
-
-        // console.log(
-        //     mouse.clicked.status,
-        //     mouse.clicked.obj,
-        //     mouse.target.obj.parentNode.children,
-        //     mouse.clicked.status &&
-        //         (mouse.clicked.obj ===
-        //             mouse.target.obj.parentNode.children[0] ||
-        //             mouse.clicked.obj ===
-        //                 mouse.target.obj.parentNode.children[1])
-        // );
-        // moving point
-        // if (mouse.target.obj.classList.contains("dragItem")) {
-        //     if (!stateManager) {
-        //         // console.log("Hi");
-        //         saveUndoRedo("undo");
-        //         setRedo([]);
-        //         setStateManager(true);
-        //     }
-        // }
         if (
             // if pointerdown on the a dragItem
             mouse.target.obj.classList.contains("dragItem") &&
@@ -253,13 +207,8 @@ function App() {
                     mouse.clicked.index !== mouse.target.index) ||
                 !mouse.showRadius) // or clicked item is not pointerdown item
         ) {
-            // console.log("entering dragStart move");
-            // console.log(mouse.target.obj);
-            // console.log(index);
-
             if (index) {
                 mouse.target.index = index;
-                // console.log("Init XY", dragIs[mouse.target.index].currentXY);
                 mouse.target.init = {
                     x:
                         dragIs[mouse.target.index].currentXY.x -
@@ -270,7 +219,6 @@ function App() {
                 };
                 mouse.active = true;
                 dragIs[mouse.target.index].tags = { active: true };
-                // change this below
                 dragIs[
                     mouse.target.index
                 ].containerRef.current.style.zIndex = 2;
@@ -283,31 +231,14 @@ function App() {
             mouse.clicked.index === mouse.target.index &&
             dragIs[mouse.clicked.index].tags?.showRadius
         ) {
-            // console.log("Hi", stateManager);
-            // if (!stateManager) {
-            //     // console.log("Hi");
-            //     saveUndoRedo("undo");
-            //     setRedo([]);
-            //     setStateManager(true);
-            // }
             mouse.resizing.mode = true;
             mouse.showRadius = true;
             mouse.target.initialRadius = dragIs[mouse.clicked.index].radius;
-            // console.log("hi resize");
         }
         setDragIs([...dragIs]);
         setMouse(mouse);
     };
     const drag = (e) => {
-        // console.log(
-        //     document
-        //         .elementFromPoint(e.clientX, e.clientY)
-        //         .classList.contains("undoButton"),
-        //     document.elementFromPoint(e.clientX, e.clientY).classList,
-        //     document.elementFromPoint(e.clientX, e.clientY)
-        // );
-        // e.preventDefault();
-        // mouse.target.obj = document.elementFromPoint(e.clientX, e.clientY);
         if (e.type.substr(0, 5) === "touch") {
             mouse.pos.middle = {
                 x: e.touches[0].clientX,
@@ -316,25 +247,13 @@ function App() {
         } else {
             mouse.pos.middle = { x: e.clientX, y: e.clientY };
         }
-        // console.log(mouse.pos.middle);
-
         // if an item is active and the mouse movement is not a click, drag it
         if (mouse.active && !isClick(mouse.pos.start, mouse.pos.middle)) {
-            // see if these are needed...
-            // onPointClick(index, false);
-            // closePickers(index);
             closePoint();
             var index = mouse.target.index;
             if (index) {
                 e.preventDefault();
                 hideButton(true, 0);
-                // let undoButton = document.getElementsByClassName("hideButton");
-                // // console.log(undoButton);
-                // for (let k in undoButton) {
-                //     if (undoButton[k].classList)
-                //         undoButton[k].classList.add("hidden");
-                // }
-                // console.log(undoButton);
                 try {
                     dragIs[index].containerRef.current.style.zIndex = 2; // bringing item to top
                 } catch {}
@@ -357,19 +276,16 @@ function App() {
         }
         // resizing
         else if (mouse.resizing.mode) {
-            // console.log("point is at ", pointCentre(mouse.clicked.index));
             if (mouse.clicked.index) {
                 let r = dist(pointCentre(mouse.clicked.index), {
                     x: mouse.pos.middle.x - 20,
                     y: mouse.pos.middle.y - 20,
                 });
-                // console.log(r - 25, mouse.target.initialRadius);
                 if (mouse.resizing.start) {
                     dragIs[mouse.clicked.index].radius = Math.max(
                         Math.abs(r) - 25,
                         0
                     );
-                    // console.log(Math.abs(r), dragIs[mouse.clicked.index].radius);
                 } else if (r - 25 >= mouse.target.initialRadius) {
                     dragIs[mouse.clicked.index].tags
                         ? (dragIs[mouse.clicked.index].tags.resizing = true)
@@ -382,35 +298,6 @@ function App() {
         } else if (mouse.down) {
             dragStart(e);
         }
-        // else if (mouseBound.clicked.status && mouseBound.resizing) {
-        //     let index = mouseBound.clicked.index;
-        //     let radiusInc = dist(mouseBound.pos.start, mouseBound.pos.middle);
-        //     console.log({ radiusInc });
-        //     dragIs[index].radius = dragIs[index].oldRadius + radiusInc;
-        //     setDragIs([...dragIs]);
-        //     // } else if (whosClicked() && dragIs[whosClicked("index")].resizing) {
-        //     //     let radiusInc = dist(mouse.pos.start, mouse.pos.middle);
-        //     //     console.log({ radiusInc });
-        //     //     let index = whosClicked("index");
-        //     //     dragIs[index].radius = dragIs[index].oldRadius + radiusInc;
-        //     //     setDragIs([...dragIs]);
-        //     // } else if (
-        //     //     mouse.pos.down &&
-        //     //     (!isAnyClicked() || (isAnyClicked() && whosClicked() !== target))
-        //     // ) {
-        //     //     dragStart(e);
-        // } else {
-        //     // var target = document.elementFromPoint(e.clientX, e.clientY);
-        //     // // console.log(target)
-        //     // try {
-        //     //     if (target.tagName === "CANVAS")
-        //     //         console.log(
-        //     //             target
-        //     //                 .getContext("2d")
-        //     //                 .getImageData(e.clientX, e.clientY, 1, 1).data
-        //     //         );
-        //     // } catch {}
-        // }
         setDragIs([...dragIs]);
         setMouse(mouse);
     };
@@ -426,7 +313,6 @@ function App() {
         }
         let index = mouse.target.index;
         if (index) {
-            // console.log(JSON.parse(JSON.stringify(mouse.active)));
             let target = document.elementFromPoint(e.clientX, e.clientY);
             // item is clicked, show radius
             if (
@@ -434,7 +320,6 @@ function App() {
                 (target.classList.contains("dragItem") ||
                     target.classList.contains("dragIWeight"))
             ) {
-                // console.log("Hello click");
                 try {
                     dragIs[index].containerRef.current.style.zIndex = dragIs[
                         index
@@ -442,13 +327,10 @@ function App() {
                         ? 1
                         : 2;
                 } catch {}
-                // console.log("clicked", mouse.clicked.status);
-                // console.log(!mouse.clicked.status);
                 if (
                     !mouse.clicked.status ||
                     (mouse.clicked.target && mouse.clicked.target !== target)
                 ) {
-                    // console.log("clicking", target);
                     mouse.clicked.status = true;
                     mouse.clicked.target = target;
                     mouse.clicked.index = getIndex(target);
@@ -462,21 +344,15 @@ function App() {
                     mouse.clicked.target &&
                     mouse.clicked.target === target
                 ) {
-                    // console.log("unclicking");
                     mouse.clicked.status = false;
                     closePoint();
                     mouse.clicked.target = undefined;
                     mouse.clicked.index = undefined;
                 }
-                // popUndoRedo("undo");
-                // onPointClick(index, !dragIs[index].clicked);
             } else if (mouse.resizing.start) {
-                // console.log("hello resize");
                 delete dragIs[index].tags.resizing;
-                // dragIs[index].oldRadius = dragIs[index].radius;
             } else if (mouse.active) {
                 hideButton(false);
-                // console.log("hello active fello, go to sleep");
                 closePoint();
                 mouse.active = false;
                 try {
@@ -494,7 +370,6 @@ function App() {
             setDragIs([...dragIs]);
         }
         setPotChange(true);
-        // console.log("after clicked", mouse.clicked.status);
     };
     const getIndex = (obj) => {
         for (let i in dragIs) {
@@ -512,7 +387,6 @@ function App() {
         }
         setTimeout(() => {
             let undoButton = document.getElementsByClassName("hideButton");
-            // console.log(undoButton);
             for (let k in undoButton) {
                 if (undoButton[k].classList)
                     if (state) {
@@ -612,7 +486,6 @@ function App() {
     const onPointClick = (index, state) => {
         dragIs[index].clicked = state;
         dragIs[index].oldRadius = dragIs[index].radius;
-        // dragIs[index].showPicker = state;
         setDragIs(dragIs);
     };
     const dist = (p1, p2) => {
@@ -643,30 +516,16 @@ function App() {
         if (update) setDragIs(dragIs);
     };
     const onChangeColor = (index, color, finish = false) => {
-        // if (!finish) {
-        //     // console.log("setting color before new", stateMan);
-        //     saveUndoRedo("undo");
-        //     setRedo([]);
-        //     setStateManager(true);
-        // }
         let newDragIs = [...dragIs];
         newDragIs[index].colour = color;
         setDragIs([...newDragIs]);
         if (finish) setPotChange(true);
-        // setStateManager(finish);
     };
     const pushToView = (state, dontCopyToRedo = false) => {
-        // console.log("test");
-        // if (!dontCopyToRedo) {
-        //     console.log("Is Different state?", differentState(state, view));
-        // }
         if (dontCopyToRedo) {
             let newView = copyDragIs(state);
             setView(newView);
         } else if (differentState(state, view)) {
-            // console.log("Different state, inside pushToView", !dontCopyToRedo);
-
-            // console.log("Setting undo");
             setUndo([...undo, view]);
             setRedo([]);
             let newView = copyDragIs(state);
@@ -674,36 +533,15 @@ function App() {
         }
     };
     const differentState = (newState, oldState) => {
-        // console.trace();
         let diff =
             JSON.stringify(removeDOMItems(newState)) !=
             JSON.stringify(removeDOMItems(oldState));
-        // console.log(
-        //     diff
-        //         ? `"${JSON.stringify(
-        //               removeDOMItems(newState),
-        //               null,
-        //               2
-        //           )}",\n\n"${JSON.stringify(
-        //               removeDOMItems(newState),
-        //               null,
-        //               2
-        //           )}",\n`
-        //         : "",
-        //     `Different?`,
-        //     diff
-        // );
         return (
             JSON.stringify(removeDOMItems(newState)) !=
             JSON.stringify(removeDOMItems(oldState))
         );
     };
     const copyDragIs = (state) => {
-        // let copyState = new Array(0);
-        // for (let i in state) {
-        //     let item = { ...state[i] };
-        //     copyState.push(item);
-        // }
         let copyState = JSON.parse(JSON.stringify(removeDOMItems(state)));
         return copyState;
     };
@@ -737,16 +575,12 @@ function App() {
         setDragIs([...dragIs]);
     };
     const saveUndoRedo = (action) => {
-        // console.log("calling once");
         let state;
         let newState = JSON.stringify(removeDOMItems(dragIs), null, 2);
         if (action === "undo") {
-            // if (!undo.length || differentState(dragIs, undo[undo.length - 1])) {
-            // console.log(JSON.parse(newState));
             state = JSON.parse(newState);
             // }
         } else if (action === "redo") {
-            // if (!redo.length || differentState(dragIs, redo[redo.length - 1]))
             state = JSON.parse(newState);
         }
         console.log(state);
@@ -774,26 +608,17 @@ function App() {
             setUndo(undo.slice(0, undo.length - 1));
             setUndoRedo(true);
             setPotChange(true);
-            // legacy method
-            // saveUndoRedo("redo");
-            // setDragIs(undo.pop());
-            // setUndo(undo);
         } else if (action === "redo" && redo.length) {
             setUndo([...undo, view]);
             setDragIs(redo[redo.length - 1]);
             setRedo(redo.slice(0, redo.length - 1));
             setUndoRedo(true);
             setPotChange(true);
-            // legacy method
-            // saveUndoRedo("undo");
-            // setDragIs(redo.pop());
-            // setRedo(redo);
         }
         mouse.down = false;
     };
     useEffect(() => {
         if (potChange) {
-            // console.log("Calling pushToView", potChange);
             pushToView(dragIs, undoRedo);
             if (undoRedo) setUndoRedo(false);
             setPotChange(false);
@@ -803,7 +628,6 @@ function App() {
         getCanvasPoints(true);
     }, [dragIs]);
     useEffect(() => {
-        // console.log("Calling pushToView during init");
         pushToView(dragIs, true);
         setPotChange(false);
         hideButton(false, 500);
