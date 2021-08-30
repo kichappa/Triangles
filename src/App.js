@@ -439,55 +439,6 @@ function App() {
         }
         setDragIs(dragIs);
     };
-    const closePickers = (index) => {
-        for (let i in dragIs) {
-            if (i !== index) {
-                dragIs[i].showPicker = false;
-                dragIs[i].containerRef.current.style.zIndex = 1;
-            }
-        }
-        setDragIs(dragIs);
-    };
-    const isAnyActive = () => {
-        let active = false;
-        for (let i in dragIs) {
-            active = active || dragIs[i].active;
-        }
-        return active;
-    };
-    const isAnyClicked = () => {
-        let clicked = false;
-        for (let i in dragIs) {
-            clicked = clicked || dragIs[i].clicked;
-        }
-        return clicked;
-    };
-    const whosClicked = (returnType = "DOM") => {
-        let clicked = -1;
-        for (let i in dragIs) {
-            if (dragIs[i].clicked) clicked = i;
-        }
-        // console.log(clicked);
-        if (clicked !== -1) {
-            if (returnType === "DOM") return dragIs[clicked].pointRef.current;
-            else if (returnType === "index") return clicked;
-            else if (returnType === "full") {
-                return dragIs[clicked].pointRef.current.parentNode.children;
-            }
-        } else return undefined;
-    };
-    const isPickerActive = () => {
-        let showPicker = false;
-        for (let i in dragIs) {
-            showPicker = showPicker || dragIs[i].showPicker;
-        }
-        return showPicker;
-    };
-    const onPointClick = (index, state) => {
-        dragIs[index].clicked = state;
-        dragIs[index].oldRadius = dragIs[index].radius;
-        setDragIs(dragIs);
-    };
     const dist = (p1, p2) => {
         return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
     };
@@ -573,32 +524,6 @@ function App() {
             }
         } else dragIs[index].tags = { showPicker: true };
         setDragIs([...dragIs]);
-    };
-    const saveUndoRedo = (action) => {
-        let state;
-        let newState = JSON.stringify(removeDOMItems(dragIs), null, 2);
-        if (action === "undo") {
-            state = JSON.parse(newState);
-            // }
-        } else if (action === "redo") {
-            state = JSON.parse(newState);
-        }
-        console.log(state);
-
-        if (action === "undo" && state) setUndo([...undo, state]);
-        else if (action === "redo" && state) setRedo([...redo, state]);
-    };
-    const popUndoRedo = (action) => {
-        let stateHistory;
-        if (action === "undo") {
-            stateHistory = [...undo];
-            stateHistory.pop();
-            setUndo(stateHistory);
-        } else if (action === "redo") {
-            stateHistory = [...redo];
-            stateHistory.pop();
-            setRedo(stateHistory);
-        }
     };
     const undoRedoClicked = (action) => {
         if (action === "undo" && undo.length) {
