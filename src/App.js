@@ -209,7 +209,11 @@ function App() {
         mouse.target.obj = document.elementFromPoint(e.clientX, e.clientY);
         var index = getIndex(mouse.target.obj);
         mouse.target.index = index;
-
+        // console.log("Target is ", mouse.target.obj, mouse.target.obj.id);
+        if (!mouse.target.obj.classList.contains("dragItem")) {
+            // console.log("hi");
+            hideButton(false, 0, "0.3s");
+        }
         // console.log("target is", mouse.target.obj);
         // console.log("whosClicked", whosClicked());
         // console.log(
@@ -500,8 +504,12 @@ function App() {
         }
         return undefined;
     };
-    async function hideButton(state, timeout) {
-        if (!state && !timeout) timeout = 700;
+    async function hideButton(state, timeout, animTime) {
+        if (!state && timeout === undefined) timeout = 700;
+        if (animTime === undefined) {
+            if (state) animTime = "0.15s";
+            else animTime = "1s";
+        }
         setTimeout(() => {
             let undoButton = document.getElementsByClassName("hideButton");
             // console.log(undoButton);
@@ -509,12 +517,14 @@ function App() {
                 if (undoButton[k].classList)
                     if (state) {
                         undoButton[k].classList.add("hidden");
-                        undoButton[k].style.transition =
-                            "all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1), opacity 0.15s ease-in-out";
+                        undoButton[
+                            k
+                        ].style.transition = `all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1), opacity ${animTime} ease-in-out`;
                     } else {
                         undoButton[k].classList.remove("hidden");
-                        undoButton[k].style.transition =
-                            "all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1), opacity 1s ease-in-out";
+                        undoButton[
+                            k
+                        ].style.transition = `all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1), opacity ${animTime} ease-in-out`;
                     }
             }
         }, timeout);

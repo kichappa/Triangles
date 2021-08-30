@@ -54,6 +54,7 @@ const Canvas = ({ id, canvasPoints }) => {
         }
     };
     useEffect(() => {
+        // console.log("Something Changed");
         setPoints(canvasPoints);
         shootPixel();
         // eslint-disable-next-line react-hooks/exhaustive-deps

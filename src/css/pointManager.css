@@ -24,6 +24,7 @@
 }
 
 .undo-redo {
+    padding: 10px;
     z-index: 0;
     position: absolute;
     display: flex;
@@ -70,7 +71,7 @@
 }
 
 .undo-redo button {
-    margin: 10px;
+    /* margin: 10px; */
     height: 40px;
     width: 40px;
 
