@@ -1,10 +1,14 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Points from "./components/Points";
 import Canvas from "./components/Canvas";
 import { FaPlus, FaMinus, FaUndoAlt, FaRedoAlt } from "react-icons/fa";
 
 function App() {
+    /**
+     * @type {boolean} Potential change in the system is stored here.
+     * Any function that changes the system changes this, and useEffect looks for this flagged to push to undo. */
     const [potChange, setPotChange] = useState(false);
+    /** @type {object} Stores various mouse states */
     const [mouse, setMouse] = useState({
         down: false,
         stateSaved: false,
@@ -47,6 +51,12 @@ function App() {
     const [undo, setUndo] = useState([]);
     const [redo, setRedo] = useState([]);
     const [undoRedo, setUndoRedo] = useState(false);
+    /**
+     * Function to convert colour object in RGB to HSL, HSV and Hex reperesentations.
+     *
+     * @param {object} rgb
+     * @return {{rgb:object, hsv:object, hsl:object, hex:object}} Various colour representations.
+     */
     const rgbToHslHsvHex = (rgb) => {
         var rgbArr = [rgb.r, rgb.g, rgb.b];
         var M, m, C, hue, V, L, Sv, Sl;
@@ -80,6 +90,7 @@ function App() {
         }
         return { rgb: rgb, hsv: hsv, hsl: hsl, hex: hex };
     };
+    /** @type {object} RGB colour object, the default colour at initialization */
     var defaultColour = rgbToHslHsvHex({
         r: Math.random() * 255,
         g: Math.random() * 255,
@@ -87,21 +98,30 @@ function App() {
     });
     const [dragIs, setDragIs] = useState([
         {
-            // While not being dragged, [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0), (used in transform: translate3D(X, Y, 0))
-            // While being dragged,
-            //      pointerOffset[X, Y] stores the pointerOffset X and Y offset of the pointer to the anchor of dragItem
-            //      currentXY[X, Y] stores the total X and Y offsets from the pointerOffset position (0,0).
-            // After a drag event, all [pointerOffset, currentXY, offset] stores the same value, the X and Y coordinate from the original position (0,0); again.
+            /** @type {React.MutableRefObject} The reference to the `dragItem` DOM item. */
             pointRef: null,
+            /** @type {React.MutableRefObject} The reference to the `dragIContainer` DOM item. */
             containerRef: null,
+            /** @type {number} The radius of the colour point. */
             radius: 0,
+            /** @type {{rgb:object, hsv:object, hsl:object, hex:string}} Various colour representations of the point. */
             colour: defaultColour,
+            /** @type {boolean} tells React to show/hide the colour picker. */
             showPicker: false,
+            /** @type {{x:number, y:number}} controls the location of the `dragIContainer`, relative to the `outerContainer`. */
             currentXY: { x: 50, y: 50 },
+            /** @type {Array} The CSS size of `dragItem`. */
             size: undefined,
+            /** @type {Array} The CSS size of `div` inside `dragIContainer`. */
             containerSize: undefined,
         },
     ]);
+    /**
+     * Function to convert multi-representation colour object to 2x3 array of RGB and HSV representations.
+     *
+     * @param {{rgb:object, hsv:object, [hsl:object, hex:object]}} obj
+     * @return {[Array, Array]} [[h, s, v], [r, g, b]].
+     */
     const hsvRgbObjToArr = (obj) => {
         var arr = [
             [0, 0, 0],
@@ -111,6 +131,12 @@ function App() {
         arr[1] = [obj.rgb.r, obj.rgb.g, obj.rgb.b];
         return arr;
     };
+    /**
+     * Function to convert `DragIs[]` array to `canvasPoints[]` state that the renderer expects.
+     *
+     * @param {boolean} set Set the canvasPoints state or not?
+     * @return {{x, y, colour:object colourArr:Array, radius: number}[]} canvasPoints if not `set`.
+     */
     const getCanvasPoints = (set) => {
         let points = new Array(dragIs.length);
         for (let i in dragIs) {
