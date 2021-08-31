@@ -8,6 +8,7 @@ function App() {
      * @type {boolean} Potential change in the system is stored here.
      * Any function that changes the system changes this, and useEffect looks for this flagged to push to undo. */
     const [potChange, setPotChange] = useState(false);
+    const [renderPage, setRenderPage] = useState(false);
     /** @type {object} Stores various mouse states */
     const [mouse, setMouse] = useState({
         down: false,
@@ -204,6 +205,7 @@ function App() {
         };
         setDragIs([...dragIs, newDragItem]);
         setPotChange(true);
+        setRenderPage(true);
     };
     /**
      * Function to remove the DragItem of specified index. The function sets the `dragIs[]` state and flags `potChange` at exit.
@@ -219,6 +221,7 @@ function App() {
         newDragIs.splice(index, 1);
         setDragIs([...newDragIs]);
         setPotChange(true);
+        setRenderPage(true);
         console.log("New points are ", dragIs);
     };
     /**
@@ -282,6 +285,7 @@ function App() {
             mouse.target.initialRadius = dragIs[mouse.clicked.index].radius; // set initial radius of the object
         }
         setDragIs([...dragIs]);
+        setRenderPage(true);
         setMouse(mouse);
     };
     const drag = (e) => {
@@ -338,6 +342,10 @@ function App() {
             dragStart(e);
         }
         setDragIs([...dragIs]);
+        if (mouse.down) {
+            // console.log("mouse is down");
+            setRenderPage(true);
+        }
         setMouse(mouse);
     };
     const dragEnd = (e) => {
@@ -411,6 +419,7 @@ function App() {
             setDragIs([...dragIs]);
         }
         setPotChange(true);
+        setRenderPage(true);
     };
     const getIndex = (obj) => {
         for (let i in dragIs) {
@@ -523,6 +532,7 @@ function App() {
         let newDragIs = [...dragIs];
         newDragIs[index].colour = color;
         setDragIs([...newDragIs]);
+        setRenderPage(true);
         if (finish) setPotChange(true);
     };
     const pushToView = (state, dontCopyToRedo = false) => {
@@ -582,30 +592,38 @@ function App() {
         if (action === "undo" && undo.length) {
             setRedo([...redo, view]);
             setDragIs(undo[undo.length - 1]);
-            console.log(undo.slice(0, undo.length - 1));
             setUndo(undo.slice(0, undo.length - 1));
             setUndoRedo(true);
             setPotChange(true);
+            setRenderPage(true);
         } else if (action === "redo" && redo.length) {
             setUndo([...undo, view]);
             setDragIs(redo[redo.length - 1]);
             setRedo(redo.slice(0, redo.length - 1));
             setUndoRedo(true);
             setPotChange(true);
+            setRenderPage(true);
         }
         mouse.down = false;
     };
     useEffect(() => {
+        if (renderPage) {
+            try {
+                getCanvasPoints(true);
+                setRenderPage(false);
+            } catch (err) {
+                console.error("Error is rendering page.", err);
+            }
+        }
         if (potChange) {
             pushToView(dragIs, undoRedo);
             if (undoRedo) setUndoRedo(false);
             setPotChange(false);
         }
-    }, [potChange]);
+    }, [renderPage]);
     useEffect(() => {
         getCanvasPoints(true);
-    }, [dragIs]);
-    useEffect(() => {
+        setRenderPage(false);
         pushToView(dragIs, true);
         setPotChange(false);
         hideButton(false, 500);
