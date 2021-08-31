@@ -44,8 +44,8 @@ const getFragmentShader = (length) => {
         return mM;
     }
 
-    float rgbToHue(vec3 rgb){
-        float hue=0.0, C;
+    vec2 rgbToHueSv(vec3 rgb){
+        float hue=0.0, C, V, Sv;
         vec2 mM = minMax(rgb);
         C = mM[1] - mM[0];
         if(C==0.0){
@@ -57,7 +57,13 @@ const getFragmentShader = (length) => {
             hue =     (rgb[0] - rgb[1]) / C + 4.0;
         }
         hue = mod((mod(hue * 60.0, 360.0) + 360.0), 360.0);
-        return hue;
+
+        
+        V = mM[1]/255.0;
+        if(V==0.0) Sv = 0.0;
+        else Sv = C/(V*255.0);
+
+        return vec2(hue, Sv);
     }
 
     float f(int n, vec3 hsv){
@@ -85,11 +91,7 @@ const getFragmentShader = (length) => {
         for(int i=0;i<${length};i++){
             float d = dist(pointsXY[i], position);
             if(abs(d)>0.0000001){
-                // float invD = 1.0*pow(float(i+1), 1.0)/d;
-                // float invD = (1.0+pointsRadius[i]/10.0)/d;
-                float invD = (1.0+pointsRadius[i]/10.0)/d;
-                // invD = invD* (1.0+pointsRadius[i]/10.0);
-                // invD = pow(1.0/d, (1.0+pointsRadius[i]/10.0));
+                float invD = pow((1.0+pointsRadius[i]/10.0)/d, 3.0);
                 hsv += invD * pointsHSV[i];
                 rgb += invD * pointsRGB[i];
                 invSum += invD;
@@ -100,7 +102,9 @@ const getFragmentShader = (length) => {
         if(pointCentre == -1){
             hsv = hsv/invSum;
             rgb = rgb/invSum;
-            hsv[0] = rgbToHue(rgb);
+            vec2 HueSv = rgbToHueSv(rgb);
+            hsv[0] = HueSv[0];
+            hsv[1] = (1.0*HueSv[1]+1.0*hsv[1])/2.0;
             outColor = vec4(hsvToRgb(hsv),1);
         }else{
             hsv = pointsHSV[pointCentre];
