@@ -104,7 +104,7 @@ const getFragmentShader = (length) => {
             rgb = rgb/invSum;
             vec2 HueSv = rgbToHueSv(rgb);
             hsv[0] = HueSv[0];
-            hsv[1] = (1.0*HueSv[1]+1.0*hsv[1])/2.0;
+            hsv[1] = (1.25*HueSv[1]+0.75*hsv[1])/2.0;
             outColor = vec4(hsvToRgb(hsv),1);
         }else{
             hsv = pointsHSV[pointCentre];
