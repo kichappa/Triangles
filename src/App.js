@@ -275,7 +275,7 @@ function App() {
         else if (
             mouse.clicked.status && // some item is clicked...
             mouse.clicked.index === mouse.target.index && // and clicked item is pointerdown item...
-            dragIs[mouse.clicked.index].tags?.showRadius // and clicked item is in showRadius mode, not colour picker mode.
+            dragIs[mouse.clicked.index]?.tags?.showRadius // and clicked item is in showRadius mode, not colour picker mode.
         ) {
             mouse.resizing.mode = true; // enable resizing mode, but not start it yet.
             mouse.showRadius = true; // show it's radius
@@ -375,10 +375,12 @@ function App() {
                     mouse.clicked.index = getIndex(target);
                     closePoint(mouse.clicked.index);
                     mouse.showRadius = true;
-                    dragIs[mouse.clicked.index].tags = {
-                        clicked: true,
-                        showRadius: true,
-                    };
+                    try {
+                        dragIs[mouse.clicked.index].tags = {
+                            clicked: true,
+                            showRadius: true,
+                        };
+                    } catch {}
                 } else if (
                     mouse.clicked.target &&
                     mouse.clicked.target === target
