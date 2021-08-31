@@ -45,6 +45,12 @@ function App() {
                 x: 0,
                 y: 0,
             },
+            getXY: function (from) {
+                if (from === "start") return [this.start.x, this.start.y];
+                else if (from === "middle")
+                    return [this.middle.x, this.middle.y];
+                else if (from === "end") return [this.end.x, this.end.y];
+            },
         },
     });
     const [view, setView] = useState([]);
@@ -155,6 +161,9 @@ function App() {
         else return points;
     };
     const [canvasPoints, setCanvasPoints] = useState(false);
+    /**
+     * Function to add a new DragItem with random colour and position. The function sets the `dragIs[]` state and flags `potChange` at exit.
+     */
     const addDragItem = () => {
         var currentXY = { x: 50, y: 50 },
             colour;
@@ -196,7 +205,12 @@ function App() {
         setDragIs([...dragIs, newDragItem]);
         setPotChange(true);
     };
-    const removeDragItem = ({ index }) => {
+    /**
+     * Function to remove the DragItem of specified index. The function sets the `dragIs[]` state and flags `potChange` at exit.
+     *
+     * @param {number} index the index of the DragItem to be removed.
+     */
+    const removeDragItem = (index) => {
         if (index === -1) {
             index = dragIs.length - 1;
         }
@@ -207,34 +221,40 @@ function App() {
         setPotChange(true);
         console.log("New points are ", dragIs);
     };
+    /**
+     * Pointer down event handler that enables modification of DragItems.
+     *
+     * @param {MouseEvent} e The mouse event variable.
+     */
     const dragStart = (e) => {
-        mouse.down = true;
-        if (e.type.substr(0, 5) === "touch") {
-            mouse.pos.start = {
-                x: e.touches[0].clientX,
-                y: e.touches[0].clientY,
-            };
-        } else {
-            mouse.pos.start = { x: e.clientX, y: e.clientY };
-        }
-        mouse.pos.end = mouse.pos.start; // not sure if this is needed.
+        mouse.down = true; // pointer is down
+        mouse.pos.start = getPointerLocation(e); // getting pointer location
 
-        mouse.target.obj = document.elementFromPoint(e.clientX, e.clientY);
+        // acquire pointer target
+        mouse.target.obj = document.elementFromPoint(
+            ...mouse.pos.getXY("start")
+        );
+        // index of the target in the dragIs[] array
         var index = getIndex(mouse.target.obj);
-        mouse.target.index = index;
+        if (index) mouse.target.index = index;
+
+        // Unhide hideButtons that were hidden previously
         if (!mouse.target.obj.classList.contains("dragItem")) {
             hideButton(false, 0, "0.3s");
         }
+
+        // moving a point or making it clicked (highlighted)...
         if (
-            // if pointerdown on the a dragItem
+            // if pointerdown on the a dragItem and...
             mouse.target.obj.classList.contains("dragItem") &&
-            (!mouse.clicked.status || // if none is clicked,
-                (mouse.clicked.status &&
-                    mouse.clicked.index !== mouse.target.index) ||
-                !mouse.showRadius) // or clicked item is not pointerdown item
+            (!mouse.clicked.status || // if none is clicked, ...
+            (mouse.clicked.status && // or clicked item is not pointerdown item...
+                mouse.clicked.index !== mouse.target.index) || // or radius is not being modified (or shown).
+                !mouse.showRadius)
         ) {
             if (index) {
-                mouse.target.index = index;
+                // this if is just to catch the error "dragIs[index] is undefined" that appears for some fucking reason.
+                // save the initial location of the target before it is moved.
                 mouse.target.init = {
                     x:
                         dragIs[mouse.target.index].currentXY.x -
@@ -243,36 +263,29 @@ function App() {
                         dragIs[mouse.target.index].currentXY.y -
                         mouse.pos.start.y,
                 };
-                mouse.active = true;
+                mouse.active = true; // set mouse.active to indicate some point is starting to be moved (technically moved is set in drag where the mouse movement is checked to be isClick() or not).
+                // set mouse to be active and bring it to top in CSS.
                 dragIs[mouse.target.index].tags = { active: true };
                 dragIs[
                     mouse.target.index
                 ].containerRef.current.style.zIndex = 2;
             }
         }
-        // resizing point
+        // start resizing the clicked (highlighted) point
         else if (
-            // clicked item is pointerdown item
-            mouse.clicked.status &&
-            mouse.clicked.index === mouse.target.index &&
-            dragIs[mouse.clicked.index].tags?.showRadius
+            mouse.clicked.status && // some item is clicked...
+            mouse.clicked.index === mouse.target.index && // and clicked item is pointerdown item...
+            dragIs[mouse.clicked.index].tags?.showRadius // and clicked item is in showRadius mode, not colour picker mode.
         ) {
-            mouse.resizing.mode = true;
-            mouse.showRadius = true;
-            mouse.target.initialRadius = dragIs[mouse.clicked.index].radius;
+            mouse.resizing.mode = true; // enable resizing mode, but not start it yet.
+            mouse.showRadius = true; // show it's radius
+            mouse.target.initialRadius = dragIs[mouse.clicked.index].radius; // set initial radius of the object
         }
         setDragIs([...dragIs]);
         setMouse(mouse);
     };
     const drag = (e) => {
-        if (e.type.substr(0, 5) === "touch") {
-            mouse.pos.middle = {
-                x: e.touches[0].clientX,
-                y: e.touches[0].clientY,
-            };
-        } else {
-            mouse.pos.middle = { x: e.clientX, y: e.clientY };
-        }
+        mouse.pos.middle = getPointerLocation(e);
         // if an item is active and the mouse movement is not a click, drag it
         if (mouse.active && !isClick(mouse.pos.start, mouse.pos.middle)) {
             closePoint();
@@ -404,6 +417,18 @@ function App() {
             }
         }
         return undefined;
+    };
+    const getPointerLocation = (e) => {
+        let position = { x: undefined, y: undefined };
+        if (e.type.substr(0, 5) === "touch") {
+            position = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY,
+            };
+        } else {
+            position = { x: e.clientX, y: e.clientY };
+        }
+        return position;
     };
     async function hideButton(state, timeout, animTime) {
         if (!state && timeout === undefined) timeout = 700;
@@ -612,7 +637,7 @@ function App() {
                     </button>
                     <button
                         className="button minus hideButton hidden"
-                        onClick={() => removeDragItem({ index: -1 })}
+                        onClick={() => removeDragItem(-1)}
                     >
                         <FaMinus />
                     </button>
