@@ -44,7 +44,7 @@ const getFragmentShader = (length) => {
         return mM;
     }
 
-    vec2 rgbToHueSv(vec3 rgb){
+    vec3 rgbToHsv(vec3 rgb){
         float hue=0.0, C, V, Sv;
         vec2 mM = minMax(rgb);
         C = mM[1] - mM[0];
@@ -59,11 +59,11 @@ const getFragmentShader = (length) => {
         hue = mod((mod(hue * 60.0, 360.0) + 360.0), 360.0);
 
         
-        V = mM[1]/255.0;
+        V = mM[1];
         if(V==0.0) Sv = 0.0;
-        else Sv = C/(V*255.0);
+        else Sv = C/(V);
 
-        return vec2(hue, Sv);
+        return vec3(hue, Sv, V);
     }
 
     float f(int n, vec3 hsv){
@@ -102,10 +102,20 @@ const getFragmentShader = (length) => {
         if(pointCentre == -1){
             hsv = hsv/invSum;
             rgb = rgb/invSum;
-            vec2 HueSv = rgbToHueSv(rgb);
-            hsv[0] = HueSv[0];
-            hsv[1] = (1.25*HueSv[1]+0.75*hsv[1])/2.0;
+            // outColor = vec4(rgb, 1);
+            vec3 rgbInHsv = rgbToHsv(rgb);
+            // outColor = vec4(rgb, 1);
+            hsv[0] = rgbInHsv[0];
+            // hsv[1] = (1.25*rgbInHsv[1]+0.75*hsv[1])/2.0;
+            // hsv[1] = (2.0*rgbInHsv[1]+0.0*hsv[1])/2.0;
+            hsv[1] = rgbInHsv[1];
+            hsv[2] = (1.75*rgbInHsv[2]+0.25*hsv[2])/2.0;
+            // hsv[2]=0.5;
             outColor = vec4(hsvToRgb(hsv),1);
+            // outColor = vec4(rgb,1);
+            // outColor = vec4(hsv,1);
+            // outColor = vec4(hsv[0]/360.0, hsv[1], hsv[2], 1);
+            // outColor = vec4(rgbInHsv[0]/360.0, rgbInHsv[1], rgbInHsv[2], 1);
         }else{
             hsv = pointsHSV[pointCentre];
             rgb = pointsRGB[pointCentre];
@@ -122,8 +132,8 @@ const renderGradient = (points, canvas) => {
         const gl = canvas.getContext("webgl2");
 
         // resizing canvas context to canvas width set by CSS
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+        canvas.width = canvas.offsetWidth * 1;
+        canvas.height = canvas.offsetHeight * 1;
 
         // creating program using the vs and fs functions above
         const program = createProgramFromSources(gl, [
@@ -219,7 +229,7 @@ const renderGradient = (points, canvas) => {
         gl.drawArrays(primType, offset, count);
         // requestAnimationFrame(renderGradient);
 
-        // simply reading the data
+        // // simply reading the data
         // var results = new Uint8Array(canvas.width * canvas.height * 4);
         // gl.readPixels(
         //     0,
@@ -231,15 +241,15 @@ const renderGradient = (points, canvas) => {
         //     results
         // );
         // var resultsB = [];
-        // for (let i = 0; i < canvas.width * canvas.height; i++) {
-        //     resultsB.push({
-        //         r: results[4 * i],
-        //         g: results[4 * i + 1],
-        //         b: results[4 * i + 2],
-        //         a: results[4 * i + 3],
-        //     });
-        // }
-        // console.log({ results, resultsB });
+        // // for (let i = 0; i < canvas.width * canvas.height; i++) {
+        // //     resultsB.push({
+        // //         r: results[4 * i],
+        // //         g: results[4 * i + 1],
+        // //         b: results[4 * i + 2],
+        // //         a: results[4 * i + 3],
+        // //     });
+        // // }
+        // console.log(results.slice(0, 4));
     }
 };
 
