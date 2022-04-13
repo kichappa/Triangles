@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Points from './components/Points';
 import Canvas from './components/Canvas';
 import { FaPlus, FaMinus, FaUndoAlt, FaRedoAlt } from 'react-icons/fa';
+import { atomWithHash } from 'jotai/utils';
 
 function App() {
     /**
@@ -9,6 +10,7 @@ function App() {
      * Any function that changes the system changes this, and useEffect looks for this flagged to push to undo. */
     const [potChange, setPotChange] = useState(false);
     const [renderPage, setRenderPage] = useState(false);
+    const [url, setUrl] = useState(window.location.origin);
     /** @type {object} Stores various mouse states */
     const [mouse, setMouse] = useState({
         down: false,
@@ -103,26 +105,37 @@ function App() {
         g: Math.random() * 255,
         b: Math.random() * 255,
     });
-    const [dragIs, setDragIs] = useState([
-        {
-            /** @type {React.MutableRefObject} The reference to the `dragItem` DOM item. */
-            pointRef: null,
-            /** @type {React.MutableRefObject} The reference to the `dragIContainer` DOM item. */
-            containerRef: null,
-            /** @type {number} The radius of the colour point. */
-            radius: 0,
-            /** @type {{rgb:object, hsv:object, hsl:object, hex:string}} Various colour representations of the point. */
-            colour: defaultColour,
-            /** @type {boolean} tells React to show/hide the colour picker. */
-            showPicker: false,
-            /** @type {{x:number, y:number}} controls the location of the `dragIContainer`, relative to the `outerContainer`. */
-            currentXY: { x: 50, y: 50 },
-            /** @type {Array} The CSS size of `dragItem`. */
-            size: undefined,
-            /** @type {Array} The CSS size of `div` inside `dragIContainer`. */
-            containerSize: undefined,
-        },
-    ]);
+    var paramsHash = new URLSearchParams(window.location.search);
+    var params = {};
+    for (var pair of paramsHash.entries()) {
+        params[pair[0]] = JSON.parse(Buffer.from(pair[1], 'base64').toString());
+    }
+    var initDragIs;
+    if ('points' in params) {
+        initDragIs = params['points'];
+    } else {
+        initDragIs = [
+            {
+                /** @type {React.MutableRefObject} The reference to the `dragItem` DOM item. */
+                pointRef: null,
+                /** @type {React.MutableRefObject} The reference to the `dragIContainer` DOM item. */
+                containerRef: null,
+                /** @type {number} The radius of the colour point. */
+                radius: 0,
+                /** @type {{rgb:object, hsv:object, hsl:object, hex:string}} Various colour representations of the point. */
+                colour: defaultColour,
+                /** @type {boolean} tells React to show/hide the colour picker. */
+                showPicker: false,
+                /** @type {{x:number, y:number}} controls the location of the `dragIContainer`, relative to the `outerContainer`. */
+                currentXY: { x: 50, y: 50 },
+                /** @type {Array} The CSS size of `dragItem`. */
+                size: undefined,
+                /** @type {Array} The CSS size of `div` inside `dragIContainer`. */
+                containerSize: undefined,
+            },
+        ];
+    }
+    const [dragIs, setDragIs] = useState(initDragIs);
     /**
      * Function to convert multi-representation colour object to 2x3 array of RGB and HSV representations.
      *
@@ -501,6 +514,17 @@ function App() {
         }
         setDragIs(dragIs);
     };
+    const pushNewURL = (state = dragIs) => {
+        var url_query =
+            window.location.origin +
+            '/?points=' +
+            Buffer.from(JSON.stringify(removeDOMItems(state))).toString(
+                'base64'
+            );
+        if (url !== url_query) console.log(url_query);
+        window.history.pushState(null, null, url_query);
+        setUrl(url_query);
+    };
     const dist = (p1, p2) => {
         return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
     };
@@ -544,6 +568,7 @@ function App() {
             setRedo([]);
             let newView = copyDragIs(state);
             setView(newView);
+            pushNewURL(state);
         }
     };
     const differentState = (newState, oldState) => {
@@ -605,6 +630,7 @@ function App() {
             setRenderPage(true);
         }
         mouse.down = false;
+        pushNewURL();
     };
     useEffect(() => {
         if (renderPage) {
