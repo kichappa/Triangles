@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Points from './components/Points';
 import Canvas from './components/Canvas';
 import { FaPlus, FaMinus, FaUndoAlt, FaRedoAlt } from 'react-icons/fa';
-import { atomWithHash } from 'jotai/utils';
+import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 
 function App() {
     /**
@@ -11,6 +11,7 @@ function App() {
     const [potChange, setPotChange] = useState(false);
     const [renderPage, setRenderPage] = useState(false);
     const [url, setUrl] = useState(window.location.origin);
+    const location = useLocation();
     /** @type {object} Stores various mouse states */
     const [mouse, setMouse] = useState({
         down: false,
@@ -514,7 +515,7 @@ function App() {
         }
         setDragIs(dragIs);
     };
-    const pushNewURL = (state = dragIs) => {
+    const pushNewURL = ({ state = dragIs, push = true } = {}) => {
         var url_query =
             window.location.origin +
             '/?points=' +
@@ -522,7 +523,8 @@ function App() {
                 'base64'
             );
         if (url !== url_query) console.log(url_query);
-        window.history.pushState(null, null, url_query);
+        if (push) window.history.pushState(null, null, url_query);
+        else window.history.replaceState(null, null, url_query);
         setUrl(url_query);
     };
     const dist = (p1, p2) => {
@@ -648,11 +650,31 @@ function App() {
         }
     }, [renderPage]);
     useEffect(() => {
+        var paramsHash = new URLSearchParams(window.location.search);
+        var params = {};
+        for (var pair of paramsHash.entries()) {
+            params[pair[0]] = JSON.parse(
+                Buffer.from(pair[1], 'base64').toString()
+            );
+        }
+        if ('points' in params) {
+            setDragIs([...params['points']]);
+            setUndo([...undo, view]);
+            setRedo([]);
+            let newView = copyDragIs(params['points']);
+            setView(newView);
+            setUndoRedo(true);
+            setPotChange(true);
+            setRenderPage(true);
+        }
+    }, [location]);
+    useEffect(() => {
         getCanvasPoints(true);
         setRenderPage(false);
         pushToView(dragIs, true);
         setPotChange(false);
         hideButton(false, 500);
+        if (!('points' in params)) pushNewURL({ push: false });
     }, []);
     return (
         <div
