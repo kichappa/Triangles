@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import Points from "./components/Points";
-import Canvas from "./components/Canvas";
-import { FaPlus, FaMinus, FaUndoAlt, FaRedoAlt } from "react-icons/fa";
+import React, { useState, useEffect } from 'react';
+import Points from './components/Points';
+import Canvas from './components/Canvas';
+import { FaPlus, FaMinus, FaUndoAlt, FaRedoAlt } from 'react-icons/fa';
 
 function App() {
     /**
@@ -47,10 +47,10 @@ function App() {
                 y: 0,
             },
             getXY: function (from) {
-                if (from === "start") return [this.start.x, this.start.y];
-                else if (from === "middle")
+                if (from === 'start') return [this.start.x, this.start.y];
+                else if (from === 'middle')
                     return [this.middle.x, this.middle.y];
-                else if (from === "end") return [this.end.x, this.end.y];
+                else if (from === 'end') return [this.end.x, this.end.y];
             },
         },
     });
@@ -90,10 +90,10 @@ function App() {
         let hsv = { h: hue, s: Sv, v: V, a: 1 };
         let hsl = { h: hue, s: Sl, l: L, a: 1 };
         rgb.a = 1;
-        let hex = "#";
+        let hex = '#';
         for (let i in rgbArr) {
             let colorcode = Math.floor(rgbArr[i]).toString(16);
-            hex += "0".repeat(2 - colorcode.length) + colorcode;
+            hex += '0'.repeat(2 - colorcode.length) + colorcode;
         }
         return { rgb: rgb, hsv: hsv, hsl: hsl, hex: hex };
     };
@@ -216,13 +216,13 @@ function App() {
         if (index === -1) {
             index = dragIs.length - 1;
         }
-        console.log("Removing point with key " + index);
+        console.log('Removing point with key ' + index);
         let newDragIs = dragIs;
         newDragIs.splice(index, 1);
         setDragIs([...newDragIs]);
         setPotChange(true);
         setRenderPage(true);
-        console.log("New points are ", dragIs);
+        console.log('New points are ', dragIs);
     };
     /**
      * Pointer down event handler that enables modification of DragItems.
@@ -235,21 +235,21 @@ function App() {
 
         // acquire pointer target
         mouse.target.obj = document.elementFromPoint(
-            ...mouse.pos.getXY("start")
+            ...mouse.pos.getXY('start')
         );
         // index of the target in the dragIs[] array
         var index = getIndex(mouse.target.obj);
         if (index) mouse.target.index = index;
 
         // Unhide hideButtons that were hidden previously
-        if (!mouse.target.obj.classList.contains("dragItem")) {
-            hideButton(false, 0, "0.3s");
+        if (!mouse.target.obj.classList.contains('dragItem')) {
+            hideButton(false, 0, '0.3s');
         }
 
         // moving a point or making it clicked (highlighted)...
         if (
             // if pointerdown on the a dragItem and...
-            mouse.target.obj.classList.contains("dragItem") &&
+            mouse.target.obj.classList.contains('dragItem') &&
             (!mouse.clicked.status || // if none is clicked, ...
             (mouse.clicked.status && // or clicked item is not pointerdown item...
                 mouse.clicked.index !== mouse.target.index) || // or radius is not being modified (or shown).
@@ -350,7 +350,7 @@ function App() {
     };
     const dragEnd = (e) => {
         // e.preventDefault();
-        if (e.type.substr(0, 5) === "touch") {
+        if (e.type.substr(0, 5) === 'touch') {
             mouse.pos.end = {
                 x: e.touches[0].clientX,
                 y: e.touches[0].clientY,
@@ -364,8 +364,8 @@ function App() {
             // item is clicked, show radius
             if (
                 isClick(mouse.pos.start, mouse.pos.end) &&
-                (target.classList.contains("dragItem") ||
-                    target.classList.contains("dragIWeight"))
+                (target.classList.contains('dragItem') ||
+                    target.classList.contains('dragIWeight'))
             ) {
                 try {
                     dragIs[index].containerRef.current.style.zIndex = dragIs[
@@ -431,7 +431,7 @@ function App() {
     };
     const getPointerLocation = (e) => {
         let position = { x: undefined, y: undefined };
-        if (e.type.substr(0, 5) === "touch") {
+        if (e.type.substr(0, 5) === 'touch') {
             position = {
                 x: e.touches[0].clientX,
                 y: e.touches[0].clientY,
@@ -444,20 +444,20 @@ function App() {
     async function hideButton(state, timeout, animTime) {
         if (!state && timeout === undefined) timeout = 700;
         if (animTime === undefined) {
-            if (state) animTime = "0.15s";
-            else animTime = "1s";
+            if (state) animTime = '0.15s';
+            else animTime = '1s';
         }
         setTimeout(() => {
-            let undoButton = document.getElementsByClassName("hideButton");
+            let undoButton = document.getElementsByClassName('hideButton');
             for (let k in undoButton) {
                 if (undoButton[k].classList)
                     if (state) {
-                        undoButton[k].classList.add("hidden");
+                        undoButton[k].classList.add('hidden');
                         undoButton[
                             k
                         ].style.transition = `all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1), opacity ${animTime} ease-in-out`;
                     } else {
-                        undoButton[k].classList.remove("hidden");
+                        undoButton[k].classList.remove('hidden');
                         undoButton[
                             k
                         ].style.transition = `all 0.5s cubic-bezier(0.39, 0.58, 0.57, 1), opacity ${animTime} ease-in-out`;
@@ -568,7 +568,7 @@ function App() {
                 item.containerRef = undefined;
                 delete item.tags;
             } catch (error) {
-                console.error("Error in removing DOM elements.", error);
+                console.error('Error in removing DOM elements.', error);
             }
             minimalState.push(item);
         }
@@ -589,14 +589,14 @@ function App() {
         setDragIs([...dragIs]);
     };
     const undoRedoClicked = (action) => {
-        if (action === "undo" && undo.length) {
+        if (action === 'undo' && undo.length) {
             setRedo([...redo, view]);
             setDragIs(undo[undo.length - 1]);
             setUndo(undo.slice(0, undo.length - 1));
             setUndoRedo(true);
             setPotChange(true);
             setRenderPage(true);
-        } else if (action === "redo" && redo.length) {
+        } else if (action === 'redo' && redo.length) {
             setUndo([...undo, view]);
             setDragIs(redo[redo.length - 1]);
             setRedo(redo.slice(0, redo.length - 1));
@@ -612,7 +612,7 @@ function App() {
                 getCanvasPoints(true);
                 setRenderPage(false);
             } catch (err) {
-                console.error("Error is rendering page.", err);
+                console.error('Error in rendering page.', err);
             }
         }
         if (potChange) {
@@ -638,7 +638,7 @@ function App() {
             <div id="outerContainer">
                 <div id="dragPalette">
                     <Canvas
-                        id={"gradientPalette"}
+                        id={'gradientPalette'}
                         canvasPoints={canvasPoints}
                     />
                 </div>
@@ -666,7 +666,7 @@ function App() {
                     <button
                         className="button hideButton hidden"
                         onClick={() => {
-                            undoRedoClicked("undo");
+                            undoRedoClicked('undo');
                         }}
                     >
                         <FaUndoAlt className="undoButton" />
@@ -676,7 +676,7 @@ function App() {
                     <button
                         className="button hideButton hidden"
                         onClick={() => {
-                            undoRedoClicked("redo");
+                            undoRedoClicked('redo');
                         }}
                     >
                         <FaRedoAlt />
