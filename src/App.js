@@ -109,7 +109,12 @@ function App() {
     var paramsHash = new URLSearchParams(window.location.search);
     var params = {};
     for (var pair of paramsHash.entries()) {
-        params[pair[0]] = JSON.parse(Buffer.from(pair[1], 'base64').toString());
+        // params[pair[0]] = JSON.parse(Buffer.from(pair[1], 'base64').toString());
+        try {
+            params[pair[0]] = JSON.parse(pair[1]);
+        } catch {
+            params[pair[0]] = pair[1];
+        }
     }
     var initDragIs;
     if ('points' in params) {
@@ -516,12 +521,16 @@ function App() {
         setDragIs(dragIs);
     };
     const pushNewURL = ({ state = dragIs, push = true } = {}) => {
+        // var url_query =
+        //     window.location.origin +
+        //     '/?points=' +
+        //     Buffer.from(JSON.stringify(removeDOMItems(state))).toString(
+        //         'base64'
+        //     );
         var url_query =
             window.location.origin +
             '/?points=' +
-            Buffer.from(JSON.stringify(removeDOMItems(state))).toString(
-                'base64'
-            );
+            JSON.stringify(removeDOMItems(state));
         if (url !== url_query) console.log(url_query);
         if (push) window.history.pushState(null, null, url_query);
         else window.history.replaceState(null, null, url_query);
@@ -653,9 +662,10 @@ function App() {
         var paramsHash = new URLSearchParams(window.location.search);
         var params = {};
         for (var pair of paramsHash.entries()) {
-            params[pair[0]] = JSON.parse(
-                Buffer.from(pair[1], 'base64').toString()
-            );
+            // params[pair[0]] = JSON.parse(
+            //     Buffer.from(pair[1], 'base64').toString()
+            // );
+            params[pair[0]] = JSON.parse(pair[1]);
         }
         if ('points' in params) {
             setDragIs([...params['points']]);
