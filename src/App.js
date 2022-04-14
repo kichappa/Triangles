@@ -117,10 +117,11 @@ function App() {
             // try {
             //     params[pair[0]] = JSON.parse(pair[1]);
             // } catch {
-            //     params[pair[0]] = JSON.parse(pair[1])
+            //     params[pair[0]] = pair[1]
             // }
         }
-        initDragIs = params['points'];
+        if ('points' in params) initDragIs = params['points'];
+        else throw new Error('force trip');
     } catch {
         initDragIs = [
             {
@@ -668,16 +669,19 @@ function App() {
                 params[pair[0]] = JSON.parse(
                     Buffer.from(pair[1], 'base64').toString()
                 );
-                // params[pair[0]] = JSON.parse(pair[1]);
+                // try {params[pair[0]] = JSON.parse(pair[1]);}
+                // catch {params[pair[0]] = pair[1];}
             }
-            setDragIs([...params['points']]);
-            setUndo([...undo, view]);
-            setRedo([]);
-            let newView = copyDragIs(params['points']);
-            setView(newView);
-            setUndoRedo(true);
-            setPotChange(true);
-            setRenderPage(true);
+            if ('points' in params) {
+                setDragIs([...params['points']]);
+                setUndo([...undo, view]);
+                setRedo([]);
+                let newView = copyDragIs(params['points']);
+                setView(newView);
+                setUndoRedo(true);
+                setPotChange(true);
+                setRenderPage(true);
+            } else throw new Error('force trip');
         } catch {}
     }, [location]);
     useEffect(() => {
