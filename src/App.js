@@ -7,9 +7,14 @@ import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 function App() {
     /**
      * @type {boolean} Potential change in the system is stored here.
-     * Any function that changes the system changes this, and useEffect looks for this flagged to push to undo. */
+     * Any function that changes the system changes this, and useEffect looks for this flagged to push to undo.
+     */
     const [potChange, setPotChange] = useState(false);
     const [renderPage, setRenderPage] = useState(false);
+    /**
+     * @type {window.location} The URL of the current window.
+     * Used to check for re-render requirement and prevent repeatitive pushState to the browser.
+     */
     const [url, setUrl] = useState(window.location.origin);
     const location = useLocation();
     /** @type {object} Stores various mouse states */
@@ -57,9 +62,16 @@ function App() {
             },
         },
     });
+    /**
+     * @type {Array} DOM stripped version of dragIs that can be pushed to undo redo stacks.
+     * Maintained to push to undo redo without hassle and for comparison before any push.
+     */
     const [view, setView] = useState([]);
     const [undo, setUndo] = useState([]);
     const [redo, setRedo] = useState([]);
+    /**
+     * @type {boolean} Was an undo/redo button pressed recently?
+     */
     const [undoRedo, setUndoRedo] = useState(false);
     /**
      * Function to convert colour object in RGB to HSL, HSV and Hex reperesentations.
@@ -144,6 +156,9 @@ function App() {
             },
         ];
     }
+    /**
+     * @type {Array} The functional array driving Points, Point, canvasPoints, view and everything else.
+     */
     const [dragIs, setDragIs] = useState(initDragIs);
     /**
      * Function to convert multi-representation colour object to 2x3 array of RGB and HSV representations.
@@ -534,8 +549,8 @@ function App() {
         //     window.location.origin +
         //     '/?points=' +
         //     JSON.stringify(removeDOMItems(state));
-        if (url !== url_query) console.log(url_query);
-        if (push) window.history.pushState(null, null, url_query);
+        if (push && url !== url_query)
+            window.history.pushState(null, null, url_query);
         else window.history.replaceState(null, null, url_query);
         setUrl(url_query);
     };
