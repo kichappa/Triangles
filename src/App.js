@@ -273,13 +273,13 @@ function App() {
         if (index === -1) {
             index = dragIs.length - 1;
         }
-        console.log('Removing point with key ' + index);
+        // console.log('Removing point with key ' + index);
         let newDragIs = dragIs;
         newDragIs.splice(index, 1);
         setDragIs([...newDragIs]);
         setPotChange(true);
         setRenderPage(true);
-        console.log('New points are ', dragIs);
+        // console.log('New points are ', dragIs);
     };
     /**
      * Pointer down event handler that enables modification of DragItems.
@@ -296,6 +296,7 @@ function App() {
         );
         // index of the target in the dragIs[] array
         var index = getIndex(mouse.target.obj);
+        // console.log(index);
         if (index) mouse.target.index = index;
         else mouse.target.index = undefined;
 
@@ -314,6 +315,7 @@ function App() {
                 !mouse.showRadius)
         ) {
             if (index) {
+                // console.log('Going to move');
                 // this if is just to catch the error "dragIs[index] is undefined" that appears for some fucking reason.
                 // save the initial location of the target before it is moved.
                 mouse.target.init = {
@@ -338,6 +340,9 @@ function App() {
             mouse.clicked.index === mouse.target.index && // and clicked item is pointerdown item...
             dragIs[mouse.clicked.index]?.tags?.showRadius // and clicked item is in showRadius mode, not colour picker mode.
         ) {
+            // console.log('Going to resize');
+            // console.log(mouse.clicked.obj, mouse.target.obj);
+            // console.log(mouse);
             mouse.resizing.mode = true; // enable resizing mode, but not start it yet.
             mouse.showRadius = true; // show it's radius
             mouse.target.initialRadius = dragIs[mouse.clicked.index].radius; // set initial radius of the object
@@ -433,8 +438,9 @@ function App() {
                         : 2;
                 } catch {}
                 if (
+                    // Nothing is already clicked or something is already clicked and the new click target is different.
                     !mouse.clicked.status ||
-                    (mouse.clicked.target && mouse.clicked.target !== target)
+                    (mouse.clicked.obj && mouse.clicked.obj !== target)
                 ) {
                     mouse.clicked.status = true;
                     mouse.clicked.obj = target;
@@ -447,13 +453,10 @@ function App() {
                             showRadius: true,
                         };
                     } catch {}
-                } else if (
-                    mouse.clicked.target &&
-                    mouse.clicked.target === target
-                ) {
+                } else if (mouse.clicked.obj && mouse.clicked.obj === target) {
                     mouse.clicked.status = false;
                     closePoint();
-                    mouse.clicked.target = undefined;
+                    mouse.clicked.obj = undefined;
                     mouse.clicked.index = undefined;
                 }
             } else if (mouse.resizing.start) {
