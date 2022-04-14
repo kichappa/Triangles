@@ -297,6 +297,7 @@ function App() {
         // index of the target in the dragIs[] array
         var index = getIndex(mouse.target.obj);
         if (index) mouse.target.index = index;
+        else mouse.target.index = undefined;
 
         // Unhide hideButtons that were hidden previously when target is not a dragItem
         if (!mouse.target.obj.classList.contains('dragItem')) {
@@ -436,7 +437,7 @@ function App() {
                     (mouse.clicked.target && mouse.clicked.target !== target)
                 ) {
                     mouse.clicked.status = true;
-                    mouse.clicked.target = target;
+                    mouse.clicked.obj = target;
                     mouse.clicked.index = getIndex(target);
                     closePoint(mouse.clicked.index);
                     mouse.showRadius = true;
