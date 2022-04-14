@@ -19,41 +19,61 @@ function App() {
     const location = useLocation();
     /** @type {object} Stores various mouse states */
     const [mouse, setMouse] = useState({
+        /** @type {boolean} Is the mouse down or not? */
         down: false,
+        /** @type {boolean} Not sure what went through my mind */
         stateSaved: false,
+        /** @type {object} The clicked object */
         clicked: {
+            /** @type {boolean} Is the mouse down or not? */
             status: false,
+            /** @type {BigInteger} Index of the dragItem that is in clicked mode. */
             index: undefined,
+            /** @type {React.MutableRefObject} Reference of the dragItem that is in clicked mode. */
             obj: undefined,
         },
+        /** @type {boolean} Is radius of some dragItem being shown or not? */
         showRadius: false,
         active: false,
+        /** @type {object} The resizing object */
         resizing: {
+            /** @type {boolean} Is some dragItem being resized or not? */
             mode: false,
+            /** @type {object} ?? The start point of the resize event. */
             start: false,
         },
+        /** @type {object} The mouse target object. */
         target: {
+            /** @type {React.MutableRefObject} Reference of the target dragItem */
             obj: undefined,
+            /** @type {BigInteger} Index of the dragItem that is targetted. */
             index: undefined,
+            /** @type {object} ?? Initial position of the targetted dragItem before mouse events. */
             initialPosition: {
                 x: 0,
                 y: 0,
             },
+            /** @type {BigInteger} Initial radius of the dragItem that is targetted. */
             initialRadius: undefined,
         },
+        /** @type {object} The mouse positions object */
         pos: {
+            /** @type {object} XY coordinates of the mouse at the start of mouse events. */
             start: {
                 x: 0,
                 y: 0,
             },
+            /** @type {object} XY coordinates of the mouse in the middle (admist) of mouse events. */
             middle: {
                 x: 0,
                 y: 0,
             },
+            /** @type {object} XY coordinates of the mouse at the end of mouse events. */
             end: {
                 x: 0,
                 y: 0,
             },
+            /** @type {object} Function to return the above coordinates as a [x, y] array. */
             getXY: function (from) {
                 if (from === 'start') return [this.start.x, this.start.y];
                 else if (from === 'middle')
@@ -278,7 +298,7 @@ function App() {
         var index = getIndex(mouse.target.obj);
         if (index) mouse.target.index = index;
 
-        // Unhide hideButtons that were hidden previously
+        // Unhide hideButtons that were hidden previously when target is not a dragItem
         if (!mouse.target.obj.classList.contains('dragItem')) {
             hideButton(false, 0, '0.3s');
         }
