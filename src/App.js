@@ -554,6 +554,16 @@ function App() {
         else window.history.replaceState(null, null, url_query);
         setUrl(url_query);
     };
+    const isReload = () => {
+        return (
+            (window.performance.navigation &&
+                window.performance.navigation.type === 1) ||
+            window.performance
+                .getEntriesByType('navigation')
+                .map((nav) => nav.type)
+                .includes('reload')
+        );
+    };
     const dist = (p1, p2) => {
         return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
     };
