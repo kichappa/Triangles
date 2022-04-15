@@ -573,9 +573,18 @@ function App() {
         //     window.location.origin +
         //     '/?points=' +
         //     JSON.stringify(removeDOMItems(state));
-        if (push && url !== url_query)
-            window.history.pushState(null, null, url_query);
-        else window.history.replaceState(null, null, url_query);
+        // console.log('Pushing new URL');
+        // console.log({
+        //     'old URL': window.location.href,
+        //     'new URL': url_query,
+        //     'location state': location,
+        // });
+        if (window.location.href !== url_query) {
+            if (push) window.history.pushState(null, null, url_query);
+            else window.history.replaceState(null, null, url_query);
+            // } else {
+            // console.log('Same URL, ignoring push.');
+        }
         setUrl(url_query);
     };
     const isReload = () => {
@@ -713,6 +722,7 @@ function App() {
     useEffect(() => {
         var paramsHash = new URLSearchParams(window.location.search);
         var params = {};
+        var reset = false;
         try {
             for (var pair of paramsHash.entries()) {
                 params[pair[0]] = JSON.parse(
@@ -721,17 +731,39 @@ function App() {
                 // try {params[pair[0]] = JSON.parse(pair[1]);}
                 // catch {params[pair[0]] = pair[1];}
             }
-            if ('points' in params) {
-                setDragIs([...params['points']]);
-                setUndo([...undo, view]);
-                setRedo([]);
-                let newView = copyDragIs(params['points']);
-                setView(newView);
-                setUndoRedo(true);
-                setPotChange(true);
-                setRenderPage(true);
-            } else throw new Error('force trip');
-        } catch {}
+            // console.log(params);
+            if (!('points' in params)) {
+                reset = true;
+                var defaultColour = rgbToHslHsvHex({
+                    r: Math.random() * 255,
+                    g: Math.random() * 255,
+                    b: Math.random() * 255,
+                });
+                params['points'] = [
+                    {
+                        pointRef: null,
+                        containerRef: null,
+                        radius: 0,
+                        colour: defaultColour,
+                        showPicker: false,
+                        currentXY: { x: 50, y: 50 },
+                        size: undefined,
+                        containerSize: undefined,
+                    },
+                ];
+            }
+            setDragIs([...params['points']]);
+            setUndo([...undo, view]);
+            setRedo([]);
+            let newView = copyDragIs(params['points']);
+            setView(newView);
+            setUndoRedo(true);
+            setPotChange(true);
+            setRenderPage(true);
+            pushNewURL({ push: reset });
+        } catch (error) {
+            console.log('Error occured while catching URL change: \n', error);
+        }
     }, [location]);
     useEffect(() => {
         getCanvasPoints(true);
@@ -739,7 +771,7 @@ function App() {
         pushToView(dragIs, true);
         setPotChange(false);
         hideButton(false, 500);
-        if (!('points' in params)) pushNewURL({ push: false });
+        if (!('points' in params)) pushNewURL({ push: true });
     }, []);
     return (
         <div
